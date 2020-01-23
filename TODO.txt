@@ -1,0 +1,5 @@
+﻿- Staviti main u namespace! Napraviti podnamespaceove?
+- Sve u utilu bi trbealo biti template
+- Napraviti renderer klasu
+- Samo napravi klase za matematicke tipove
+- Setanje piksela se ne smije dogoditi ako je lokacija van ekrana!

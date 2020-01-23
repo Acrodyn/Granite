@@ -1,0 +1,16 @@
+﻿  main.cpp
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(170,31): warning C4244: '=': conversion from 'Uint32' to 'float', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(177,43): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(253,85): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(253,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(254,85): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(254,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(258,85): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(258,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(259,85): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(259,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(263,85): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(263,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(264,85): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\main.cpp(264,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  MyOwnFreakinRenderer.vcxproj -> C:\Users\gglus\OneDrive\Desktop\Proj\Render\MyOwnFreakinRenderer\Debug\MyOwnFreakinRenderer.exe
