@@ -94,4 +94,28 @@ namespace Granite
 
         return multipliedVector;
     }
+
+    void MultiplyMatrixTriangle(Triangle& triangle, const FMatrix4x4& matrix)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            triangle.vertices[i] = MultiplyMatrixVector(triangle.vertices[i], matrix);
+        }
+    }
+
+    void MultiplyMatrixTriangle(const Triangle &iTriangle, Triangle& oTriangle, const FMatrix4x4& matrix)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            oTriangle.vertices[i] = MultiplyMatrixVector(iTriangle.vertices[i], matrix);
+        }
+    }
+
+    void OffsetTriangleZ(Triangle& oTriangle, float offset)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            oTriangle.vertices[i].z = oTriangle.vertices[i].z + offset;
+        }
+    }
 }

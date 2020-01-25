@@ -36,41 +36,6 @@ namespace Granite
         return projectionMatrix;
     }
 
-    Mesh GetMesh()
-    {
-        Mesh mesh;
-
-        mesh.polygonVertices = {
-
-            // SOUTH
-            { 0.0f, 0.0f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 0.0f },
-            { 0.0f, 0.0f, 0.0f,    1.0f, 1.0f, 0.0f,    1.0f, 0.0f, 0.0f },
-
-            // EAST                                                      
-            { 1.0f, 0.0f, 0.0f,    1.0f, 1.0f, 0.0f,    1.0f, 1.0f, 1.0f },
-            { 1.0f, 0.0f, 0.0f,    1.0f, 1.0f, 1.0f,    1.0f, 0.0f, 1.0f },
-
-            // NORTH                                                     
-            { 1.0f, 0.0f, 1.0f,    1.0f, 1.0f, 1.0f,    0.0f, 1.0f, 1.0f },
-            { 1.0f, 0.0f, 1.0f,    0.0f, 1.0f, 1.0f,    0.0f, 0.0f, 1.0f },
-
-            // WEST                                                      
-            { 0.0f, 0.0f, 1.0f,    0.0f, 1.0f, 1.0f,    0.0f, 1.0f, 0.0f },
-            { 0.0f, 0.0f, 1.0f,    0.0f, 1.0f, 0.0f,    0.0f, 0.0f, 0.0f },
-
-            // TOP                                                       
-            { 0.0f, 1.0f, 0.0f,    0.0f, 1.0f, 1.0f,    1.0f, 1.0f, 1.0f },
-            { 0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 1.0f,    1.0f, 1.0f, 0.0f },
-
-            // BOTTOM                                                    
-            { 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f },
-            { 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f,    1.0f, 0.0f, 0.0f },
-
-        };
-
-        return mesh;
-    }
-
     void ClearScreen(SDL_Surface *surface, Color clearColor)
     {
         Uint32* pixels = (Uint32*)surface->pixels;
@@ -84,7 +49,10 @@ namespace Granite
     void SetPixel(SDL_Surface* surface, int x, int y, Color color)
     {
         if (x < 0 || x >= WINDOW_WIDTH || y < 0 || y >= WINDOW_HEIGHT)
+        {
             return;
+        }
+
         *((Uint32*)surface->pixels + (y * surface->w) + x) = (Uint32)color;
     }
 
@@ -164,11 +132,10 @@ int main(int argc, char* argv[])
     float fps = 0;
 
     float fTheta = .0f;
-    Granite::Mesh test;
-    Granite::Mesh cube = Granite::GetMesh();
+    Granite::Mesh mesh;
     Granite::FMatrix4x4 projMatrix = Granite::GetProjectionMatrix();
 
-    test = Granite::ModelLoader::Load();
+    mesh = Granite::ModelLoader::Load();
 
     while (true)
     {
@@ -182,9 +149,9 @@ int main(int argc, char* argv[])
             SDL_Delay(milisecondsPerFrame - milisecondsPassed);
         }
 
-        if (milisecondsPassed > milisecondsPerFrame) {
+        //if (milisecondsPassed > milisecondsPerFrame) {
             //printf("FPS is: %f \n", 1000.f / milisecondsPassed);
-        }
+        //}
 
         SDL_PollEvent(&e);
         if (e.type == SDL_QUIT) 
@@ -197,7 +164,7 @@ int main(int argc, char* argv[])
 
         // Set up rotation matrices
         Granite::FMatrix4x4 matRotZ, matRotX;
-        fTheta += 1.0f * deltaTime;
+        fTheta += deltaTime;
 
         // Rotation Z
         matRotZ.matrix[0][0] = cosf(fTheta);
@@ -215,59 +182,50 @@ int main(int argc, char* argv[])
         matRotX.matrix[2][2] = cosf(fTheta * 0.5f);
         matRotX.matrix[3][3] = 1;
 
-        for (auto tri : test.polygonVertices)
+        int polyDrawnIndex = 0;
+
+        for (auto tri : mesh.polygonVertices)
         {
-            Granite::Triangle triProjected, triTranslated, triRotatedZ, triRotatedZX;
+            Granite::Triangle triTranslated;
 
-            // Rotate in Z-Axis
-            triRotatedZ.vertices[0] = MultiplyMatrixVector(tri.vertices[0], matRotZ);
-            triRotatedZ.vertices[1] = MultiplyMatrixVector(tri.vertices[1], matRotZ);
-            triRotatedZ.vertices[2] = MultiplyMatrixVector(tri.vertices[2], matRotZ);
-
-             // Rotate in X-Axis
-            triRotatedZX.vertices[0] = MultiplyMatrixVector(triRotatedZ.vertices[0], matRotX);
-            triRotatedZX.vertices[1] = MultiplyMatrixVector(triRotatedZ.vertices[1], matRotX);
-            triRotatedZX.vertices[2] = MultiplyMatrixVector(triRotatedZ.vertices[2], matRotX);
-
-            // Offset into the screen
-            triTranslated = triRotatedZX;
-            triTranslated.vertices[0].z = triRotatedZX.vertices[0].z + 2000.f;
-            triTranslated.vertices[1].z = triRotatedZX.vertices[1].z + 2000.f;
-            triTranslated.vertices[2].z = triRotatedZX.vertices[2].z + 2000.f;
+            // Transform
+            Granite::MultiplyMatrixTriangle(tri, triTranslated, matRotZ);
+            Granite::MultiplyMatrixTriangle(triTranslated, matRotX);
+            Granite::OffsetTriangleZ(triTranslated, 2000.f);
 
             // Project triangles from 3D --> 2D
-            triProjected.vertices[0] = MultiplyMatrixVector(triTranslated.vertices[0], projMatrix);
-            triProjected.vertices[1] = MultiplyMatrixVector(triTranslated.vertices[1], projMatrix);
-            triProjected.vertices[2] = MultiplyMatrixVector(triTranslated.vertices[2], projMatrix);
+            Granite::MultiplyMatrixTriangle(triTranslated, projMatrix);
 
             // Scale into view
-            triProjected.vertices[0].x += 1.0f; 
-            triProjected.vertices[0].y += 1.0f;
-            triProjected.vertices[1].x += 1.0f; 
-            triProjected.vertices[1].y += 1.0f;
-            triProjected.vertices[2].x += 1.0f; 
-            triProjected.vertices[2].y += 1.0f;
-            triProjected.vertices[0].x *= 0.5f * (float)WINDOW_WIDTH;
-            triProjected.vertices[0].y *= 0.5f * (float)WINDOW_HEIGHT;
-            triProjected.vertices[1].x *= 0.5f * (float)WINDOW_WIDTH;
-            triProjected.vertices[1].y *= 0.5f * (float)WINDOW_HEIGHT;
-            triProjected.vertices[2].x *= 0.5f * (float)WINDOW_WIDTH;
-            triProjected.vertices[2].y *= 0.5f * (float)WINDOW_HEIGHT;
+            triTranslated.vertices[0].x += 1.0f;
+            triTranslated.vertices[0].y += 1.0f;
+            triTranslated.vertices[1].x += 1.0f;
+            triTranslated.vertices[1].y += 1.0f;
+            triTranslated.vertices[2].x += 1.0f;
+            triTranslated.vertices[2].y += 1.0f;
+            triTranslated.vertices[0].x *= 0.5f * (float)WINDOW_WIDTH;
+            triTranslated.vertices[0].y *= 0.5f * (float)WINDOW_HEIGHT;
+            triTranslated.vertices[1].x *= 0.5f * (float)WINDOW_WIDTH;
+            triTranslated.vertices[1].y *= 0.5f * (float)WINDOW_HEIGHT;
+            triTranslated.vertices[2].x *= 0.5f * (float)WINDOW_WIDTH;
+            triTranslated.vertices[2].y *= 0.5f * (float)WINDOW_HEIGHT;
 
             Granite::DrawLine(surface, 
-                Granite::IPoint(triProjected.vertices[0].x, triProjected.vertices[0].y),
-                Granite::IPoint(triProjected.vertices[1].x, triProjected.vertices[1].y),
+                Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
+                Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
                 Granite::Color::Red);
 
             Granite::DrawLine(surface,
-                Granite::IPoint(triProjected.vertices[1].x, triProjected.vertices[1].y),
-                Granite::IPoint(triProjected.vertices[2].x, triProjected.vertices[2].y),
+                Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
+                Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
                 Granite::Color::Red);
 
             Granite::DrawLine(surface,
-                Granite::IPoint(triProjected.vertices[2].x, triProjected.vertices[2].y),
-                Granite::IPoint(triProjected.vertices[0].x, triProjected.vertices[0].y),
+                Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
+                Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
                 Granite::Color::Red);
+
+            ++polyDrawnIndex;
         }
 
         SDL_UpdateWindowSurface(window);
