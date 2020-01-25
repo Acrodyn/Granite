@@ -13,7 +13,6 @@ namespace Granite
 	class ModelLoader 
 	{
 	public:
-		// zapravo vraca mesh!
 		static Mesh Load()
 		{
 			std::ifstream file("Jess.obj");
@@ -21,6 +20,8 @@ namespace Granite
 			Mesh mesh;
 
 			std::vector<FVector3> vertices = {};
+			std::vector<FVector3> textureCoords = {};
+			std::vector<FVector3> normals = {};
 
 			if (file.is_open())
 			{
@@ -33,27 +34,27 @@ namespace Granite
 					// vertex
 					if (dataType == "v")
 					{
-						_LoadVertex(line, vertices);
+						_LoadData(line, vertices);
 					}
 					// texture coordinate
 					else if (dataType == "vt")
 					{
-
+						_LoadData(line, textureCoords);
 					}
 					// vertex normals
 					else if (dataType == "vn")
 					{
-
+						_LoadData(line, normals);
 					}
 					// parameter space vertices
 					else if (dataType == "vp")
 					{
-
+						
 					}
 					// polygonal face element
 					else if (dataType == "f")
 					{
-						_LoadPoly(line, vertices, mesh);
+						_LoadPoly(line, vertices, textureCoords, normals, mesh);
 					}
 					// line element
 					else if (dataType == "l")
@@ -67,26 +68,26 @@ namespace Granite
 		}
 	private:
 
-		static void _LoadVertex(std::string line, std::vector<FVector3> &vertices)
+		static void _LoadData(std::string line, std::vector<FVector3> &storage)
 		{
 			int phase = 0;
-			float vectorData[3] = {};
-			FVector3 vertexVector;
+			float storageData[3] = {};
+			FVector3 tempStorageVector; // TODO: Remove after fVector classification
 			std::stringstream lineData(line);
 			std::string data;
 			lineData >> data;
 
 			while (lineData >> data)
 			{
-				vectorData[phase++] = std::stof(data);
+				storageData[phase++] = std::stof(data);
 			}
 
-			vertexVector.SetData(vectorData[0], vectorData[1], vectorData[2]);
-			vertices.push_back(vertexVector);
+			tempStorageVector.SetData(storageData[0], storageData[1], storageData[2]);
+			storage.push_back(tempStorageVector);
 		}
 
 		// v/vt/vn
-		static void _LoadPoly(std::string line, const std::vector<FVector3> &vertices, Mesh &mesh)
+		static void _LoadPoly(std::string line, const std::vector<FVector3> &vertices, const std::vector<FVector3>& textureCoords, const std::vector<FVector3>& normals, Mesh &mesh)
 		{
 			int dataCountIndex = 0;
 			std::stringstream lineData(line);
@@ -97,7 +98,6 @@ namespace Granite
 			Triangle vertexIndices;
 			Triangle textureIndices;
 			Triangle normalIndices;
-			int pos = 0;
 
 			while (lineData >> data)
 			{
@@ -114,8 +114,10 @@ namespace Granite
 							vertexIndices.vertices[dataCountIndex].SetData(vertices.at(std::stoi(value) - 1));
 							break;
 						case 1:
+							textureIndices.vertices[dataCountIndex].SetData(textureCoords.at(std::stoi(value) - 1));
 							break;
 						case 2:
+							normalIndices.vertices[dataCountIndex].SetData(normals.at(std::stoi(value) - 1));
 							break;
 						}
 					}
@@ -125,6 +127,8 @@ namespace Granite
 			}
 
 			mesh.polygonVertices.push_back(vertexIndices);
+			mesh.textureCoordinates.push_back(textureIndices);
+			mesh.vertexNormals.push_back(normalIndices);
 		}
 	};
 }
