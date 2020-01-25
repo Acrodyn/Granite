@@ -25,6 +25,21 @@ namespace Granite
             this->y = y;
             this->z = z;
         }*/
+
+
+        void SetData(float x, float y, float z)
+        {
+            this->x = x;
+            this->y = y;
+            this->z = z;
+        }
+
+        void SetData(FVector3 vector)
+        {
+            this->x = vector.x;
+            this->y = vector.y;
+            this->z = vector.z;
+        }
     };
 
     struct Triangle
@@ -34,7 +49,9 @@ namespace Granite
 
     struct Mesh
     {
-        std::vector<Triangle> planes;
+        std::vector<Triangle> polygonVertices;
+        std::vector<Triangle> textureCoordinates;
+        std::vector<Triangle> vertexNormals;
     };
 
     struct FMatrix4x4
@@ -49,21 +66,7 @@ namespace Granite
 
     FVector3 MultiplyMatrixVector(const FVector3 &vector, const FMatrix4x4 &matrix)
     {
-        FVector3 multipliedVector;
-
-        multipliedVector.x = vector.x * matrix.matrix[0][0] + vector.y * matrix.matrix[1][0] + vector.z * matrix.matrix[2][0] + matrix.matrix[3][0];
-        multipliedVector.y = vector.x * matrix.matrix[0][1] + vector.y * matrix.matrix[1][1] + vector.z * matrix.matrix[2][1] + matrix.matrix[3][1];
-        multipliedVector.z = vector.x * matrix.matrix[0][2] + vector.y * matrix.matrix[1][2] + vector.z * matrix.matrix[2][2] + matrix.matrix[3][2];
-        float w = vector.x * matrix.matrix[0][3] + vector.y * matrix.matrix[1][3] + vector.z * matrix.matrix[2][3] + matrix.matrix[3][3];
-
-        if (w != 0.0f)
-        {
-            multipliedVector.x /= w; multipliedVector.y /= w; multipliedVector.z /= w;
-        }
-
-        return multipliedVector;
-
-        /*const float inVecData[4] = { vector.x, vector.y, vector.z, 1};
+        const float inVecData[4] = { vector.x, vector.y, vector.z, 1};
         float outVecData[4] = { 0 };
 
         for (int i = 0; i < 4; ++i)
@@ -89,8 +92,6 @@ namespace Granite
         multipliedVector.y = outVecData[1];
         multipliedVector.z = outVecData[2];
 
-        return multipliedVector;*/
-
-        //return FVector3(outVecData[0], outVecData[1], outVecData[2]);
+        return multipliedVector;
     }
 }

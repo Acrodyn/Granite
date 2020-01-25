@@ -3,3 +3,5 @@
 - Napraviti renderer klasu
 - Samo napravi klase za matematicke tipove
 - Setanje piksela se ne smije dogoditi ako je lokacija van ekrana!
+- Load freakin quads I guess!
+- Staviti sva math sranja u klase, fuck it!

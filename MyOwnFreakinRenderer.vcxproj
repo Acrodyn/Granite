@@ -155,10 +155,12 @@
   <ItemGroup>
     <ClCompile Include="GRenderer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GMath.h" />
     <ClInclude Include="GRenderer.h" />
+    <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>

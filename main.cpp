@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include "GMath.h"
 #include "Util.h"
+#include "ModelLoader.h"
 
 const int WINDOW_WIDTH = 640;
 const int WINDOW_HEIGHT = 480;
@@ -39,7 +40,7 @@ namespace Granite
     {
         Mesh mesh;
 
-        mesh.planes = {
+        mesh.polygonVertices = {
 
             // SOUTH
             { 0.0f, 0.0f, 0.0f,    0.0f, 1.0f, 0.0f,    1.0f, 1.0f, 0.0f },
@@ -82,6 +83,8 @@ namespace Granite
 
     void SetPixel(SDL_Surface* surface, int x, int y, Color color)
     {
+        if (x < 0 || x >= WINDOW_WIDTH || y < 0 || y >= WINDOW_HEIGHT)
+            return;
         *((Uint32*)surface->pixels + (y * surface->w) + x) = (Uint32)color;
     }
 
@@ -161,9 +164,11 @@ int main(int argc, char* argv[])
     float fps = 0;
 
     float fTheta = .0f;
-
+    Granite::Mesh test;
     Granite::Mesh cube = Granite::GetMesh();
     Granite::FMatrix4x4 projMatrix = Granite::GetProjectionMatrix();
+
+    test = Granite::ModelLoader::Load();
 
     while (true)
     {
@@ -178,7 +183,7 @@ int main(int argc, char* argv[])
         }
 
         if (milisecondsPassed > milisecondsPerFrame) {
-            printf("FPS is: %f \n", 1000.f / milisecondsPassed);
+            //printf("FPS is: %f \n", 1000.f / milisecondsPassed);
         }
 
         SDL_PollEvent(&e);
@@ -210,7 +215,7 @@ int main(int argc, char* argv[])
         matRotX.matrix[2][2] = cosf(fTheta * 0.5f);
         matRotX.matrix[3][3] = 1;
 
-        for (auto tri : cube.planes)
+        for (auto tri : test.polygonVertices)
         {
             Granite::Triangle triProjected, triTranslated, triRotatedZ, triRotatedZX;
 
@@ -226,9 +231,9 @@ int main(int argc, char* argv[])
 
             // Offset into the screen
             triTranslated = triRotatedZX;
-            triTranslated.vertices[0].z = triRotatedZX.vertices[0].z + 3.f;
-            triTranslated.vertices[1].z = triRotatedZX.vertices[1].z + 3.f;
-            triTranslated.vertices[2].z = triRotatedZX.vertices[2].z + 3.f;
+            triTranslated.vertices[0].z = triRotatedZX.vertices[0].z + 2000.f;
+            triTranslated.vertices[1].z = triRotatedZX.vertices[1].z + 2000.f;
+            triTranslated.vertices[2].z = triRotatedZX.vertices[2].z + 2000.f;
 
             // Project triangles from 3D --> 2D
             triProjected.vertices[0] = MultiplyMatrixVector(triTranslated.vertices[0], projMatrix);
