@@ -95,9 +95,9 @@ namespace Granite
 			std::string value;
 			lineData >> data;
 
-			Triangle vertexIndices;
-			Triangle textureIndices;
-			Triangle normalIndices;
+			FVector3 vertexIndices[3];
+			FVector3 textureIndices[3];
+			FVector3 normalIndices[3];
 
 			while (lineData >> data)
 			{
@@ -111,13 +111,13 @@ namespace Granite
 						switch (phase)
 						{
 						case 0:
-							vertexIndices.vertices[dataCountIndex].SetData(vertices.at(std::stoi(value) - 1));
+							vertexIndices[dataCountIndex].SetData(vertices.at(std::stoi(value) - 1));
 							break;
 						case 1:
-							textureIndices.vertices[dataCountIndex].SetData(textureCoords.at(std::stoi(value) - 1));
+							textureIndices[dataCountIndex].SetData(textureCoords.at(std::stoi(value) - 1));
 							break;
 						case 2:
-							normalIndices.vertices[dataCountIndex].SetData(normals.at(std::stoi(value) - 1));
+							normalIndices[dataCountIndex].SetData(normals.at(std::stoi(value) - 1));
 							break;
 						}
 					}
@@ -126,9 +126,7 @@ namespace Granite
 				++dataCountIndex;
 			}
 
-			mesh.polygonVertices.push_back(vertexIndices);
-			mesh.textureCoordinates.push_back(textureIndices);
-			mesh.vertexNormals.push_back(normalIndices);
+			mesh.AddPolygon(vertexIndices, textureIndices, normalIndices);
 		}
 	};
 }

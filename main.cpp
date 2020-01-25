@@ -26,12 +26,12 @@ namespace Granite
         float fAspectRatio = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
         float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
 
-        projectionMatrix(0, 0) = fAspectRatio * fFovRad;
-        projectionMatrix(1, 1) = fFovRad;
-        projectionMatrix(2, 2) = fFar / (fFar - fNear);
-        projectionMatrix(3, 2) = (-fFar * fNear) / (fFar - fNear);
-        projectionMatrix(2, 3) = 1.0f;
-        projectionMatrix(3, 3) = 0.0f;
+        projectionMatrix.matrix[0][0] = fAspectRatio * fFovRad;
+        projectionMatrix.matrix[1][1] = fFovRad;
+        projectionMatrix.matrix[2][2] = fFar / (fFar - fNear);
+        projectionMatrix.matrix[3][2] = (-fFar * fNear) / (fFar - fNear);
+        projectionMatrix.matrix[2][3] = 1.0f;
+        projectionMatrix.matrix[3][3] = 0.0f;
 
         return projectionMatrix;
     }
@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
     float fTheta = .0f;
     Granite::Mesh mesh;
     Granite::FMatrix4x4 projMatrix = Granite::GetProjectionMatrix();
+    Granite::FVector3 camera;
 
     mesh = Granite::ModelLoader::Load();
 
@@ -149,9 +150,9 @@ int main(int argc, char* argv[])
             SDL_Delay(milisecondsPerFrame - milisecondsPassed);
         }
 
-        //if (milisecondsPassed > milisecondsPerFrame) {
-            //printf("FPS is: %f \n", 1000.f / milisecondsPassed);
-        //}
+        if (milisecondsPassed > milisecondsPerFrame) {
+            printf("FPS is: %f \n", 1000.f / milisecondsPassed);
+        }
 
         SDL_PollEvent(&e);
         if (e.type == SDL_QUIT) 
@@ -182,50 +183,49 @@ int main(int argc, char* argv[])
         matRotX.matrix[2][2] = cosf(fTheta * 0.5f);
         matRotX.matrix[3][3] = 1;
 
-        int polyDrawnIndex = 0;
-
-        for (auto tri : mesh.polygonVertices)
+        for (auto &polygon : mesh.polygons)
         {
-            Granite::Triangle triTranslated;
+            Granite::Polygon triTranslated;
 
-            // Transform
-            Granite::MultiplyMatrixTriangle(tri, triTranslated, matRotZ);
-            Granite::MultiplyMatrixTriangle(triTranslated, matRotX);
-            Granite::OffsetTriangleZ(triTranslated, 2000.f);
+            Granite::MultiplyMatrixPolygon(polygon, triTranslated, matRotZ);
+            Granite::MultiplyMatrixPolygon(triTranslated, matRotX);
+            Granite::OffsetPolygonDepth(triTranslated, 1800.f);
 
-            // Project triangles from 3D --> 2D
-            Granite::MultiplyMatrixTriangle(triTranslated, projMatrix);
+            Granite::FVector3 normal, line1, line2, cameraToPoint;
 
-            // Scale into view
-            triTranslated.vertices[0].x += 1.0f;
-            triTranslated.vertices[0].y += 1.0f;
-            triTranslated.vertices[1].x += 1.0f;
-            triTranslated.vertices[1].y += 1.0f;
-            triTranslated.vertices[2].x += 1.0f;
-            triTranslated.vertices[2].y += 1.0f;
-            triTranslated.vertices[0].x *= 0.5f * (float)WINDOW_WIDTH;
-            triTranslated.vertices[0].y *= 0.5f * (float)WINDOW_HEIGHT;
-            triTranslated.vertices[1].x *= 0.5f * (float)WINDOW_WIDTH;
-            triTranslated.vertices[1].y *= 0.5f * (float)WINDOW_HEIGHT;
-            triTranslated.vertices[2].x *= 0.5f * (float)WINDOW_WIDTH;
-            triTranslated.vertices[2].y *= 0.5f * (float)WINDOW_HEIGHT;
+            line1 = triTranslated.vertices[1] - triTranslated.vertices[0];
+            line2 = triTranslated.vertices[2] - triTranslated.vertices[0];
 
-            Granite::DrawLine(surface, 
-                Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                Granite::Color::Red);
+            normal = line1.CrossProduct(line2);
+            normal.Normalize();
 
-            Granite::DrawLine(surface,
-                Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                Granite::Color::Red);
+            cameraToPoint = triTranslated.vertices[0] - camera;
+            cameraToPoint.Normalize();
 
-            Granite::DrawLine(surface,
-                Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                Granite::Color::Red);
+            // dot product
+            if (normal.DotProduct(cameraToPoint) < .0f)
+            {
+                // Project triangles from 3D --> 2D
+                Granite::MultiplyMatrixPolygon(triTranslated, projMatrix);
 
-            ++polyDrawnIndex;
+                triTranslated.UniformMove(1.0f);
+                triTranslated.Scale(0.5f * (float)WINDOW_WIDTH);
+
+                Granite::DrawLine(surface,
+                    Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
+                    Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
+                    Granite::Color::Red);
+
+                Granite::DrawLine(surface,
+                    Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
+                    Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
+                    Granite::Color::Red);
+
+                Granite::DrawLine(surface,
+                    Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
+                    Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
+                    Granite::Color::Red);
+            }
         }
 
         SDL_UpdateWindowSurface(window);
