@@ -13,33 +13,72 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\GMath">
+      <UniqueIdentifier>{06e63322-82ef-457a-bfa5-894ddb700f6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GGraphics">
+      <UniqueIdentifier>{26847fb3-fa4e-4f13-8cbc-7b8a03c3448b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GGraphics">
+      <UniqueIdentifier>{f66991dd-c453-42e3-b470-f5e058348fe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUtils">
+      <UniqueIdentifier>{faaf524e-3af3-4283-a7a1-0c0ef035f97d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GMath">
+      <UniqueIdentifier>{dc2fe771-d738-4f9b-bb3d-1d369fa47193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUtils">
+      <UniqueIdentifier>{f5b7da15-f576-41b2-adbe-b24faa385c51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GRenderer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Src\GGraphics\GGraphics.cpp">
+      <Filter>Source Files\GGraphics</Filter>
     </ClCompile>
-    <ClCompile Include="ModelLoader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Src\GMath\Polygon.cpp">
+      <Filter>Source Files\GMath</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GMath\GMath.cpp">
+      <Filter>Source Files\GMath</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GUtils\GUtil.cpp">
+      <Filter>Source Files\GUtils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GRenderer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Include\GGraphics\GGraphics.h">
+      <Filter>Header Files\GGraphics</Filter>
     </ClInclude>
-    <ClInclude Include="GMath.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Include\GGraphics\GModelLoader.h">
+      <Filter>Header Files\GGraphics</Filter>
     </ClInclude>
-    <ClInclude Include="Util.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Include\GUtils\GConfig.h">
+      <Filter>Header Files\GUtils</Filter>
     </ClInclude>
-    <ClInclude Include="ModelLoader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Include\GUtils\GUtil.h">
+      <Filter>Header Files\GUtils</Filter>
     </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Include\GMath\FMatrix4x4.h">
+      <Filter>Header Files\GMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GMath\FVector3.h">
+      <Filter>Header Files\GMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GMath\GMath.h">
+      <Filter>Header Files\GMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GMath\IPoint.h">
+      <Filter>Header Files\GMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GMath\Mesh.h">
+      <Filter>Header Files\GMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GMath\Polygon.h">
+      <Filter>Header Files\GMath</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

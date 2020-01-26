@@ -6,22 +6,22 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "GMath.h"
+#include "GMath/GMath.h"
 
 namespace Granite
 {
 	class ModelLoader 
 	{
 	public:
-		static Mesh Load()
+		static GMath::Mesh Load()
 		{
 			std::ifstream file("Jess.obj");
 
-			Mesh mesh;
+			GMath::Mesh mesh;
 
-			std::vector<FVector3> vertices = {};
-			std::vector<FVector3> textureCoords = {};
-			std::vector<FVector3> normals = {};
+			std::vector<GMath::FVector3> vertices = {};
+			std::vector<GMath::FVector3> textureCoords = {};
+			std::vector<GMath::FVector3> normals = {};
 
 			if (file.is_open())
 			{
@@ -68,11 +68,11 @@ namespace Granite
 		}
 	private:
 
-		static void _LoadData(std::string line, std::vector<FVector3> &storage)
+		static void _LoadData(std::string line, std::vector<GMath::FVector3> &storage)
 		{
 			int phase = 0;
 			float storageData[3] = {};
-			FVector3 tempStorageVector; // TODO: Remove after fVector classification
+			GMath::FVector3 tempStorageVector; // TODO: Remove after fVector classification
 			std::stringstream lineData(line);
 			std::string data;
 			lineData >> data;
@@ -87,7 +87,7 @@ namespace Granite
 		}
 
 		// v/vt/vn
-		static void _LoadPoly(std::string line, const std::vector<FVector3> &vertices, const std::vector<FVector3>& textureCoords, const std::vector<FVector3>& normals, Mesh &mesh)
+		static void _LoadPoly(std::string line, const std::vector<GMath::FVector3> &vertices, const std::vector<GMath::FVector3>& textureCoords, const std::vector<GMath::FVector3>& normals, GMath::Mesh &mesh)
 		{
 			int dataCountIndex = 0;
 			std::stringstream lineData(line);
@@ -95,9 +95,9 @@ namespace Granite
 			std::string value;
 			lineData >> data;
 
-			FVector3 vertexIndices[3];
-			FVector3 textureIndices[3];
-			FVector3 normalIndices[3];
+			GMath::FVector3 vertexIndices[3];
+			GMath::FVector3 textureIndices[3];
+			GMath::FVector3 normalIndices[3];
 
 			while (lineData >> data)
 			{

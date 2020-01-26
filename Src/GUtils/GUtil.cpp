@@ -1,8 +1,8 @@
-#pragma once
+#include "GUtils/GUtil.h"
 
 namespace Granite
 {
-    namespace Util
+    namespace GUtil
     {
         int Abs(int number)
         {

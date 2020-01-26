@@ -90,7 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\Libs\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Libs\SDL2\include;$(SolutionDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,7 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\Libs\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Libs\SDL2\include;$(SolutionDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,16 +153,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GRenderer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="Src\GGraphics\GGraphics.cpp" />
+    <ClCompile Include="Src\GMath\GMath.cpp" />
+    <ClCompile Include="Src\GMath\Polygon.cpp" />
+    <ClCompile Include="Src\GUtils\GUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Config.h" />
-    <ClInclude Include="GMath.h" />
-    <ClInclude Include="GRenderer.h" />
-    <ClInclude Include="ModelLoader.h" />
-    <ClInclude Include="Util.h" />
+    <ClInclude Include="Include\GGraphics\GGraphics.h" />
+    <ClInclude Include="Include\GGraphics\GModelLoader.h" />
+    <ClInclude Include="Include\GMath\FMatrix4x4.h" />
+    <ClInclude Include="Include\GMath\FVector3.h" />
+    <ClInclude Include="Include\GMath\GMath.h" />
+    <ClInclude Include="Include\GMath\IPoint.h" />
+    <ClInclude Include="Include\GMath\Mesh.h" />
+    <ClInclude Include="Include\GMath\Polygon.h" />
+    <ClInclude Include="Include\GUtils\GConfig.h" />
+    <ClInclude Include="Include\GUtils\GUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODO.txt" />

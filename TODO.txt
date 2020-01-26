@@ -1,8 +1,7 @@
-﻿- Staviti main u namespace! Napraviti podnamespaceove?
-- Sve u utilu bi trbealo biti template
-- Napraviti renderer klasu
+﻿- Sve u utilu bi trbealo biti template
 - Samo napravi klase za matematicke tipove
-- Setanje piksela se ne smije dogoditi ako je lokacija van ekrana!
 - Load freakin quads I guess!
 - Staviti sva math sranja u klase, fuck it!
-- Napravi neku vrstu strukture projekta, dude
+- Napravi input manager 
+- Napravi nekakav time manager
+- Portaj sve što je potrebno u h/cpp format

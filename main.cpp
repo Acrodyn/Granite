@@ -1,127 +1,14 @@
 #include "SDL.h"
-#include "GMath.h"
-#include "Util.h"
-#include "ModelLoader.h"
-
-const int WINDOW_WIDTH = 640;
-const int WINDOW_HEIGHT = 480;
-
-namespace Granite
-{
-    enum class Color {
-        Red = 0xFF0000,
-        Green = 0x00FF00,
-        Blue = 0x0000FF,
-        White = 0xFFFFFF,
-        Black = 0x000000,
-    };
-
-    FMatrix4x4 GetProjectionMatrix()
-    {
-        FMatrix4x4 projectionMatrix;
-
-        float fNear = 0.1f;
-        float fFar = 1000.0f;
-        float fFov = 90.0f;
-        float fAspectRatio = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
-        float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
-
-        projectionMatrix.matrix[0][0] = fAspectRatio * fFovRad;
-        projectionMatrix.matrix[1][1] = fFovRad;
-        projectionMatrix.matrix[2][2] = fFar / (fFar - fNear);
-        projectionMatrix.matrix[3][2] = (-fFar * fNear) / (fFar - fNear);
-        projectionMatrix.matrix[2][3] = 1.0f;
-        projectionMatrix.matrix[3][3] = 0.0f;
-
-        return projectionMatrix;
-    }
-
-    void ClearScreen(SDL_Surface *surface, Color clearColor)
-    {
-        Uint32* pixels = (Uint32*)surface->pixels;
-        for (int i = 0, len = WINDOW_WIDTH * WINDOW_HEIGHT; i < len; ++i)
-        {
-            *pixels = (Uint32)clearColor;
-            ++pixels;
-        }
-    }
-
-    void SetPixel(SDL_Surface* surface, int x, int y, Color color)
-    {
-        if (x < 0 || x >= WINDOW_WIDTH || y < 0 || y >= WINDOW_HEIGHT)
-        {
-            return;
-        }
-
-        *((Uint32*)surface->pixels + (y * surface->w) + x) = (Uint32)color;
-    }
-
-    // Bresenham’s Line Drawing Algorithm
-    void DrawLine(SDL_Surface* surface, IPoint startPosition, IPoint endPosition, Color color)
-    {
-        if (startPosition.x == endPosition.x && startPosition.y == endPosition.y)
-        {
-            SetPixel(surface, startPosition.x, startPosition.y, color);
-            return;
-        }
-
-        bool steep = false;
-
-        if (Util::Abs(startPosition.x - endPosition.x) < Util::Abs(startPosition.y - endPosition.y))
-        {
-            Util::Swap(startPosition.x, startPosition.y);
-            Util::Swap(endPosition.x, endPosition.y);
-            steep = true;
-        }
-
-        if (startPosition.x > endPosition.x)
-        {
-            Util::Swap(startPosition.x, endPosition.x);
-            Util::Swap(startPosition.y, endPosition.y);
-        }
-
-        int dx = endPosition.x - startPosition.x;
-        int dy = endPosition.y - startPosition.y;
-
-        int deltaError = Util::Abs(dy) << 2;
-        int error = 0;
-
-        int y = startPosition.y;
-
-        for (int x = startPosition.x; x <= endPosition.x; ++x)
-        {
-            if (steep)
-            {
-                SetPixel(surface, y, x, color);
-            }
-            else
-            {
-                SetPixel(surface, x, y, color);
-            }
-
-            error += deltaError;
-
-            if (error > dx)
-            {
-                y += (endPosition.y > startPosition.y) ? 1 : -1;
-                error -= dx << 2;
-            }
-        }
-    }
-}
+#include "GMath/GMath.h"
+#include "GUtils/GUtil.h"
+#include "GUtils/GConfig.h"
+#include "GGraphics/GModelLoader.h"
+#include "GGraphics/GGraphics.h"
 
 int main(int argc, char* argv[])
 {
-    SDL_Window* window = SDL_CreateWindow("An SDL2 window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+    Granite::GGraphics::InitGraphics();
 
-    if (window == NULL) {
-        printf("Could not create window: %s\n", SDL_GetError());
-        return 1;
-    }
-
-    SDL_Init(0);
-
-    SDL_Surface* surface = SDL_GetWindowSurface(window);
     SDL_Event e;
 
     float milisecondsPassed = 0;
@@ -132,9 +19,9 @@ int main(int argc, char* argv[])
     float fps = 0;
 
     float fTheta = .0f;
-    Granite::Mesh mesh;
-    Granite::FMatrix4x4 projMatrix = Granite::GetProjectionMatrix();
-    Granite::FVector3 camera;
+    Granite::GMath::Mesh mesh;
+    Granite::GMath::FMatrix4x4 projMatrix = Granite::GGraphics::GetProjectionMatrix();
+    Granite::GMath::FVector3 camera;
 
     mesh = Granite::ModelLoader::Load();
 
@@ -161,10 +48,10 @@ int main(int argc, char* argv[])
             break;
         }
 
-        Granite::ClearScreen(surface, Granite::Color::Black);
+        Granite::GGraphics::ClearScreen(Granite::GGraphics::Color::Black);
 
         // Set up rotation matrices
-        Granite::FMatrix4x4 matRotZ, matRotX;
+        Granite::GMath::FMatrix4x4 matRotZ, matRotX;
         fTheta += deltaTime;
 
         // Rotation Z
@@ -185,13 +72,13 @@ int main(int argc, char* argv[])
 
         for (auto &polygon : mesh.polygons)
         {
-            Granite::Polygon triTranslated;
+            Granite::GMath::Polygon triTranslated;
 
-            Granite::MultiplyMatrixPolygon(polygon, triTranslated, matRotZ);
-            Granite::MultiplyMatrixPolygon(triTranslated, matRotX);
-            Granite::OffsetPolygonDepth(triTranslated, 1800.f);
+            Granite::GMath::MultiplyMatrixPolygon(polygon, triTranslated, matRotZ);
+            Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotX);
+            Granite::GMath::OffsetPolygonDepth(triTranslated, 1800.f);
 
-            Granite::FVector3 normal, line1, line2, cameraToPoint;
+            Granite::GMath::FVector3 normal, line1, line2, cameraToPoint;
 
             line1 = triTranslated.vertices[1] - triTranslated.vertices[0];
             line2 = triTranslated.vertices[2] - triTranslated.vertices[0];
@@ -206,32 +93,32 @@ int main(int argc, char* argv[])
             if (normal.DotProduct(cameraToPoint) < .0f)
             {
                 // Project triangles from 3D --> 2D
-                Granite::MultiplyMatrixPolygon(triTranslated, projMatrix);
+                Granite::GMath::MultiplyMatrixPolygon(triTranslated, projMatrix);
 
                 triTranslated.UniformMove(1.0f);
-                triTranslated.UniformScale(0.5f * (float)WINDOW_WIDTH);
+                triTranslated.UniformScale(0.5f * (float)Granite::GConfig::WINDOW_WIDTH);
 
-                Granite::DrawLine(surface,
-                    Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                    Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                    Granite::Color::Red);
+                Granite::GGraphics::DrawLine(
+                    Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
+                    Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
+                    Granite::GGraphics::Color::Red);
 
-                Granite::DrawLine(surface,
-                    Granite::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                    Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                    Granite::Color::Red);
+                Granite::GGraphics::DrawLine(
+                    Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
+                    Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
+                    Granite::GGraphics::Color::Red);
 
-                Granite::DrawLine(surface,
-                    Granite::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                    Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                    Granite::Color::Red);
+                Granite::GGraphics::DrawLine(
+                    Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
+                    Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
+                    Granite::GGraphics::Color::Red);
             }
         }
 
-        SDL_UpdateWindowSurface(window);
+        Granite::GGraphics::UpdateWindow();
     }
 
     // Close and destroy the window
-    SDL_DestroyWindow(window);
+    Granite::GGraphics::DestroyGraphics();
     return 0;
 }
