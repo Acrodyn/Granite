@@ -291,5 +291,5 @@ __pycache__/
 *.hlog
 
 #Various
-.rar
-.zip
+*.rar
+*.zip
