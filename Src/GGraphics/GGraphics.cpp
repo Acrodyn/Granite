@@ -1,4 +1,5 @@
 #include "GGraphics/GGraphics.h"
+#include "GUtils/GUtil.h"
 
 namespace Granite
 {
@@ -30,7 +31,7 @@ namespace Granite
         SDL_DestroyWindow(window);
     }
 
-    void GGraphics::UpdateWindow()
+    void GGraphics::UpdateScreen()
     {
         SDL_UpdateWindowSurface(window);
     }
@@ -124,6 +125,110 @@ namespace Granite
             {
                 y += (endPosition.y > startPosition.y) ? 1 : -1;
                 error -= dx << 2;
+            }
+        }
+    }
+
+    void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, Color color)
+    {
+        const GMath::FVector3 *pv0 = &polygon.vertices[0];
+        const GMath::FVector3* pv1 = &polygon.vertices[1];
+        const GMath::FVector3* pv2 = &polygon.vertices[2];
+
+        if (pv1->y < pv0->y)
+        {
+            GUtil::Swap<const GMath::FVector3>(&pv0, &pv1);
+        }
+        if (pv2->y < pv1->y)
+        {
+            GUtil::Swap<const GMath::FVector3>(&pv1, &pv2);
+        }
+        if (pv1->y < pv0->y)
+        {
+            GUtil::Swap<const GMath::FVector3>(&pv0, &pv1);
+        }
+
+        if (pv0->y == pv1->y) // flat top
+        {
+            if (pv1->x < pv0->x)
+            {
+                GUtil::Swap<const GMath::FVector3>(&pv0, &pv1);
+            }
+            _RasterizeFlatTopTriangle(*pv0, *pv1, *pv2, color);
+        }
+        else if (pv1->y == pv2->y) // flat bottom
+        {
+            if (pv2->x < pv1->x)
+            {
+                GUtil::Swap<const GMath::FVector3>(&pv1, &pv2);
+            }
+
+            _RasterizeFlatBottomTriangle(*pv0, *pv1, *pv2, color);
+        }
+        else // non flat triangle
+        {
+            const float t = (pv1->y - pv0->y) / (pv2->y - pv0->y);
+            const GMath::FVector3 vi = *pv0 + (*pv2 - *pv0) * t;
+
+            if (pv1->x < vi.x) // major right
+            {
+                _RasterizeFlatBottomTriangle(*pv0, *pv1, vi, color);
+                _RasterizeFlatTopTriangle(*pv1, vi, *pv2, color);
+            }
+            else // major left
+            {
+                _RasterizeFlatBottomTriangle(*pv0, vi, *pv1, color);
+                _RasterizeFlatTopTriangle(vi, *pv1, *pv2, color);
+            }
+        } 
+    }
+
+    void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3 &v0, const GMath::FVector3& v1, const GMath::FVector3& v2,  Color color)
+    {
+        float slope0 = (v2.x - v0.x) / (v2.y - v0.y);
+        float slope1 = (v2.x - v1.x) / (v2.y - v1.y);
+
+        // top rule
+        const int yStart = (int)ceil(v0.y - .5f);
+        const int yEnd = (int)ceil(v2.y - .5f);
+
+        for (int y = yStart; y < yEnd; ++y)
+        {
+            const float px0 = v0.x + slope0 * (float(y) + .5f - v0.y);
+            const float px1 = v1.x + slope1 * (float(y) + .5f - v1.y);
+
+            // left rule
+            const int xStart = (int)ceil(px0 - .5f);
+            const int xEnd = (int)ceil(px1 - .5f);
+
+            for (int x = xStart; x < xEnd; ++x)
+            {
+                SetPixel(x, y, color);
+            }
+        }
+    }
+
+    void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Color color)
+    {
+        float slope0 = (v1.x - v0.x) / (v1.y - v0.y);
+        float slope1 = (v2.x - v0.x) / (v2.y - v0.y);
+
+        // top rule
+        const int yStart = (int)ceil(v0.y - .5f);
+        const int yEnd = (int)ceil(v2.y - .5f);
+
+        for (int y = yStart; y < yEnd; ++y)
+        {
+            const float px0 = v0.x + slope0 * (float(y) + .5f - v0.y);
+            const float px1 = v0.x + slope1 * (float(y) + .5f - v0.y);
+
+            // left rule
+            const int xStart = (int)ceil(px0 - .5f);
+            const int xEnd = (int)ceil(px1 - .5f);
+
+            for (int x = xStart; x < xEnd; ++x)
+            {
+                SetPixel(x, y, color);
             }
         }
     }

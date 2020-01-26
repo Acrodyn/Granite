@@ -5,3 +5,4 @@
 - Napravi input manager 
 - Napravi nekakav time manager
 - Portaj sve što je potrebno u h/cpp format
+- Multithreaded rendering

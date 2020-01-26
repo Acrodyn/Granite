@@ -98,27 +98,35 @@ int main(int argc, char* argv[])
                 triTranslated.UniformMove(1.0f);
                 triTranslated.UniformScale(0.5f * (float)Granite::GConfig::WINDOW_WIDTH);
 
-                Granite::GGraphics::DrawLine(
-                    Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                    Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                    Granite::GGraphics::Color::Red);
+                if (Granite::GConfig::WIREFRAME_MODE)
+                {
+                    Granite::GGraphics::DrawLine(
+                        Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
+                        Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
+                        Granite::GGraphics::Color::Red);
 
-                Granite::GGraphics::DrawLine(
-                    Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                    Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                    Granite::GGraphics::Color::Red);
+                    Granite::GGraphics::DrawLine(
+                        Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
+                        Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
+                        Granite::GGraphics::Color::Red);
 
-                Granite::GGraphics::DrawLine(
-                    Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                    Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                    Granite::GGraphics::Color::Red);
+                    Granite::GGraphics::DrawLine(
+                        Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
+                        Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
+                        Granite::GGraphics::Color::Red);
+                }
+
+                if (Granite::GConfig::RASTERIZE)
+                {
+                    //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::Color::Blue);
+                    Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::GetRandomColor());
+                }
             }
         }
 
-        Granite::GGraphics::UpdateWindow();
+        Granite::GGraphics::UpdateScreen();
     }
 
-    // Close and destroy the window
     Granite::GGraphics::DestroyGraphics();
     return 0;
 }

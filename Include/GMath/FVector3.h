@@ -24,9 +24,27 @@ namespace Granite
                 this->z = z;
             }
 
-            FVector3 operator-(FVector3 vector)
+            FVector3 operator-(const FVector3 vector) const
             {
-                return (FVector3(x - vector.x, y - vector.y, z - vector.z));
+                return FVector3(x - vector.x, y - vector.y, z - vector.z);
+            }
+
+            FVector3 operator+(const FVector3 vector) const
+            {
+                return FVector3(x + vector.x, y + vector.y, z + vector.z);
+            }
+
+            template<typename T>
+            FVector3 operator*(T scalar) const
+            {
+                return FVector3(x * scalar, y * scalar, z * scalar);
+            }
+
+            void operator=(const FVector3 vector)
+            {
+                this->x = vector.x;
+                this->y = vector.y;
+                this->z = vector.z;
             }
 
             void SetData(float x, float y, float z)
