@@ -158,6 +158,7 @@
     <ClCompile Include="ModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Config.h" />
     <ClInclude Include="GMath.h" />
     <ClInclude Include="GRenderer.h" />
     <ClInclude Include="ModelLoader.h" />

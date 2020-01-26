@@ -38,6 +38,9 @@
     <ClInclude Include="ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODO.txt">

@@ -2,15 +2,18 @@
 
 namespace Granite
 {
-    int Abs(int number)
+    namespace Util
     {
-        return (number >= 0 ? number : -number);
-    }
+        int Abs(int number)
+        {
+            return (number >= 0 ? number : -number);
+        }
 
-    void Swap(int& a, int& b)
-    {
-        int temp = a;
-        a = b;
-        b = temp;
+        void Swap(int& a, int& b)
+        {
+            int temp = a;
+            a = b;
+            b = temp;
+        }
     }
 }

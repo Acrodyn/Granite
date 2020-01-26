@@ -106,7 +106,7 @@ namespace Granite
             vertices[2].z += scalar;
         }
 
-        void Scale(float scalar)
+        void UniformScale(float scalar)
         {
             vertices[0].x *= scalar;
             vertices[0].y *= scalar;

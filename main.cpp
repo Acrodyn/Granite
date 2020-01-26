@@ -67,23 +67,23 @@ namespace Granite
 
         bool steep = false;
 
-        if (Abs(startPosition.x - endPosition.x) < Abs(startPosition.y - endPosition.y))
+        if (Util::Abs(startPosition.x - endPosition.x) < Util::Abs(startPosition.y - endPosition.y))
         {
-            Swap(startPosition.x, startPosition.y);
-            Swap(endPosition.x, endPosition.y);
+            Util::Swap(startPosition.x, startPosition.y);
+            Util::Swap(endPosition.x, endPosition.y);
             steep = true;
         }
 
         if (startPosition.x > endPosition.x)
         {
-            Swap(startPosition.x, endPosition.x);
-            Swap(startPosition.y, endPosition.y);
+            Util::Swap(startPosition.x, endPosition.x);
+            Util::Swap(startPosition.y, endPosition.y);
         }
 
         int dx = endPosition.x - startPosition.x;
         int dy = endPosition.y - startPosition.y;
 
-        int deltaError = Abs(dy) << 2;
+        int deltaError = Util::Abs(dy) << 2;
         int error = 0;
 
         int y = startPosition.y;
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
                 Granite::MultiplyMatrixPolygon(triTranslated, projMatrix);
 
                 triTranslated.UniformMove(1.0f);
-                triTranslated.Scale(0.5f * (float)WINDOW_WIDTH);
+                triTranslated.UniformScale(0.5f * (float)WINDOW_WIDTH);
 
                 Granite::DrawLine(surface,
                     Granite::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
