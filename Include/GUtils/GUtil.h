@@ -5,9 +5,9 @@ namespace Granite
     namespace GUtil
     {
         template <typename T>
-        int Abs(T number)
+        T Abs(T number)
         {
-            return (number >= 0 ? number : -number);
+            return ((float)number >= 0.f ? number : -number);
         }
 
         template <typename T>

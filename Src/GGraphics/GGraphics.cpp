@@ -68,16 +68,38 @@ namespace Granite
 
     void GGraphics::SetPixel(int x, int y, Color color)
     {
+        SetPixel(x, y, (Uint32)color);
+    }
+
+    void GGraphics::SetPixel(int x, int y, Pixel color)
+    {
+        SetPixel(x, y, _GetConvertedColor(color));
+    }
+
+    void GGraphics::SetPixel(int x, int y, Uint32 color)
+    {
         if (x < 0 || x >= GConfig::WINDOW_WIDTH || y < 0 || y >= GConfig::WINDOW_HEIGHT)
         {
             return;
         }
 
+        // Uint8 alpha = ((color & 0xFF000000) >> 24); not currently relevant
+
         *((Uint32*)surface->pixels + (y * surface->w) + x) = (Uint32)color;
     }
 
     // Bresenham’s Line Drawing Algorithm
+    void GGraphics::DrawLine(GMath::IPoint startPosition, GMath::IPoint endPosition, Pixel color)
+    {
+        DrawLine(startPosition, endPosition, _GetConvertedColor(color));
+    }
+
     void GGraphics::DrawLine(GMath::IPoint startPosition, GMath::IPoint endPosition, Color color)
+    {
+        DrawLine(startPosition, endPosition, (Uint32)color);
+    }
+
+    void GGraphics::DrawLine(GMath::IPoint startPosition, GMath::IPoint endPosition, Uint32 color)
     {
         if (startPosition.x == endPosition.x && startPosition.y == endPosition.y)
         {
@@ -129,7 +151,17 @@ namespace Granite
         }
     }
 
+    void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, Pixel color)
+    {
+        RasterizeTriangle(polygon, _GetConvertedColor(color));
+    }
+
     void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, Color color)
+    {
+        RasterizeTriangle(polygon, (Uint32)color);
+    }
+
+    void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color)
     {
         const GMath::FVector3 *pv0 = &polygon.vertices[0];
         const GMath::FVector3* pv1 = &polygon.vertices[1];
@@ -183,7 +215,7 @@ namespace Granite
         } 
     }
 
-    void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3 &v0, const GMath::FVector3& v1, const GMath::FVector3& v2,  Color color)
+    void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3 &v0, const GMath::FVector3& v1, const GMath::FVector3& v2,  Uint32 color)
     {
         float slope0 = (v2.x - v0.x) / (v2.y - v0.y);
         float slope1 = (v2.x - v1.x) / (v2.y - v1.y);
@@ -208,7 +240,7 @@ namespace Granite
         }
     }
 
-    void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Color color)
+    void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Uint32 color)
     {
         float slope0 = (v1.x - v0.x) / (v1.y - v0.y);
         float slope1 = (v2.x - v0.x) / (v2.y - v0.y);

@@ -74,9 +74,9 @@ int main(int argc, char* argv[])
         {
             Granite::GMath::Polygon triTranslated;
 
-            Granite::GMath::MultiplyMatrixPolygon(polygon, triTranslated, matRotZ);
-            Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotX);
-            Granite::GMath::OffsetPolygonDepth(triTranslated, 1800.f);
+            Granite::GMath::MultiplyMatrixPolygon(polygon, triTranslated, matRotX);
+            //Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotX);
+            Granite::GMath::OffsetPolygonDepth(triTranslated, 2000.f);
 
             Granite::GMath::FVector3 normal, line1, line2, cameraToPoint;
 
@@ -89,8 +89,10 @@ int main(int argc, char* argv[])
             cameraToPoint = triTranslated.vertices[0] - camera;
             cameraToPoint.Normalize();
 
+            float dotProduct = normal.DotProduct(cameraToPoint);
+
             // dot product
-            if (normal.DotProduct(cameraToPoint) < .0f)
+            if (dotProduct < .0f)
             {
                 // Project triangles from 3D --> 2D
                 Granite::GMath::MultiplyMatrixPolygon(triTranslated, projMatrix);
@@ -118,8 +120,12 @@ int main(int argc, char* argv[])
 
                 if (Granite::GConfig::RASTERIZE)
                 {
-                    //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::Color::Blue);
-                    Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::GetRandomColor());
+                    Granite::GGraphics::Pixel newColor(128, 128, 128);
+                    float intensity = Granite::GUtil::Abs(dotProduct);
+                    newColor.SetIntensity(intensity);
+                    Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
+                    //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::Color::Green);
+                    //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::GetRandomColor());
                 }
             }
         }
