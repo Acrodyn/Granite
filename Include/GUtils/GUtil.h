@@ -4,6 +4,8 @@ namespace Granite
 {
     namespace GUtil
     {
+        const float MAX_FLOAT = 0x0 | 0x7F800000;
+
         template <typename T>
         T Abs(T number)
         {

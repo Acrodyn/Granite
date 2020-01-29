@@ -3,8 +3,9 @@
 
 namespace Granite
 {
-	SDL_Surface* GGraphics::surface = nullptr;
 	SDL_Window* GGraphics::window = nullptr;
+	SDL_Surface* GGraphics::surface = nullptr;
+    float* GGraphics::depthBuffer = nullptr;
 
     void GGraphics::InitGraphics()
     {
@@ -63,6 +64,23 @@ namespace Granite
         {
             *pixels = (Uint32)clearColor;
             ++pixels;
+        }
+    }
+
+    void GGraphics::ClearDepthBuffer()
+    {
+        if (depthBuffer != nullptr)
+        {
+            delete [] depthBuffer;
+            depthBuffer = nullptr;
+        }
+
+        int size = GConfig::WINDOW_WIDTH * GConfig::WINDOW_HEIGHT;
+        depthBuffer = new float[size];
+
+        for (int i = 0; i < size; ++i)
+        {
+            depthBuffer[i] = GUtil::MAX_FLOAT;
         }
     }
 
@@ -220,23 +238,52 @@ namespace Granite
         float slope0 = (v2.x - v0.x) / (v2.y - v0.y);
         float slope1 = (v2.x - v1.x) / (v2.y - v1.y);
 
+        const float stepZLeft = 1.f / (v2.y - v0.y);
+        const float stepZRight = 1.f / (v2.y - v1.y);
+
         // top rule
         const int yStart = (int)ceil(v0.y - .5f);
         const int yEnd = (int)ceil(v2.y - .5f);
+
+        float zTrackerL = 0.f;
+        float zTrackerR = 0.f;
 
         for (int y = yStart; y < yEnd; ++y)
         {
             const float px0 = v0.x + slope0 * (float(y) + .5f - v0.y);
             const float px1 = v1.x + slope1 * (float(y) + .5f - v1.y);
 
+            const float zL = v0.z * (1.f - zTrackerL) + v1.z * zTrackerL;
+            const float zR = v1.z * (1.f - zTrackerL) + v2.z * zTrackerL;
+
             // left rule
             const int xStart = (int)ceil(px0 - .5f);
             const int xEnd = (int)ceil(px1 - .5f);
 
+            float z = 0;
+            float actualZTracker = 0.f;
+            float stepZRight = 1.f / (px1 - px0);
+
             for (int x = xStart; x < xEnd; ++x)
             {
-                SetPixel(x, y, color);
+                if (x < 0 || x >= GConfig::WINDOW_WIDTH || y < 0 || y >= GConfig::WINDOW_HEIGHT)
+                {
+                    return;
+                }
+
+                z = zL * (1.f - actualZTracker) + zR * actualZTracker;
+
+                if (z < depthBuffer[y * GConfig::WINDOW_WIDTH + x])
+                {
+                    depthBuffer[y * GConfig::WINDOW_WIDTH + x] = z;
+                    SetPixel(x, y, color);
+                }
+
+                actualZTracker += stepZRight;
             }
+
+            zTrackerL += stepZLeft;
+            zTrackerR += stepZRight;
         }
     }
 
@@ -245,23 +292,52 @@ namespace Granite
         float slope0 = (v1.x - v0.x) / (v1.y - v0.y);
         float slope1 = (v2.x - v0.x) / (v2.y - v0.y);
 
+        const float stepZLeft = 1.f / (v1.y - v0.y);
+        const float stepZRight = 1.f / (v2.y - v0.y);
+
         // top rule
         const int yStart = (int)ceil(v0.y - .5f);
         const int yEnd = (int)ceil(v2.y - .5f);
+
+        float zTrackerL = 0.f;
+        float zTrackerR = 0.f;
 
         for (int y = yStart; y < yEnd; ++y)
         {
             const float px0 = v0.x + slope0 * (float(y) + .5f - v0.y);
             const float px1 = v0.x + slope1 * (float(y) + .5f - v0.y);
 
+            const float zL = v0.z * (1.f - zTrackerL) + v1.z * zTrackerL;
+            const float zR = v0.z * (1.f - zTrackerL) + v2.z * zTrackerL;
+
             // left rule
             const int xStart = (int)ceil(px0 - .5f);
             const int xEnd = (int)ceil(px1 - .5f);
 
+            float z = 0;
+            float actualZTracker = 0.f;
+            float stepZRight = 1.f / (px1 - px0);
+
             for (int x = xStart; x < xEnd; ++x)
             {
-                SetPixel(x, y, color);
+                if (x < 0 || x >= GConfig::WINDOW_WIDTH || y < 0 || y >= GConfig::WINDOW_HEIGHT)
+                {
+                    return;
+                }
+
+                z = zL * (1.f - actualZTracker) + zR * actualZTracker;
+
+                if (z < depthBuffer[y * GConfig::WINDOW_WIDTH + x])
+                {
+                    depthBuffer[y * GConfig::WINDOW_WIDTH + x] = z;
+                    SetPixel(x, y, color);
+                }
+               
+                actualZTracker += stepZRight;
             }
+
+            zTrackerL += stepZLeft;
+            zTrackerR += stepZRight;
         }
     }
 }

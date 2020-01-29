@@ -11,7 +11,6 @@ namespace Granite
 class GGraphics
 	{
     public:
-
         enum class Color {
             Red = 0xFF0000,
             Green = 0x00FF00,
@@ -52,6 +51,7 @@ class GGraphics
 
         static GMath::FMatrix4x4 GetProjectionMatrix();
         static void ClearScreen(Color clearColor);
+        static void ClearDepthBuffer();
         static void SetPixel(int x, int y, Pixel color);
         static void SetPixel(int x, int y, Color color);
         static void SetPixel(int x, int y, Uint32 color); // private, maybe?
@@ -77,6 +77,7 @@ class GGraphics
     private:
         static SDL_Surface* surface;
         static SDL_Window* window;
+        static float* depthBuffer;
 
         static void _RasterizeFlatTopTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Uint32 color);
         static void _RasterizeFlatBottomTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Uint32 color);

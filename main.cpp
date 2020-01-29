@@ -49,18 +49,28 @@ int main(int argc, char* argv[])
         }
 
         Granite::GGraphics::ClearScreen(Granite::GGraphics::Color::Black);
+        Granite::GGraphics::ClearDepthBuffer();
 
         // Set up rotation matrices
-        Granite::GMath::FMatrix4x4 matRotZ, matRotX;
+        Granite::GMath::FMatrix4x4 matRotZ, matRotX, matRotY;
         fTheta += deltaTime;
 
         // Rotation Z
-        matRotZ.matrix[0][0] = cosf(fTheta);
-        matRotZ.matrix[0][1] = sinf(fTheta);
-        matRotZ.matrix[1][0] = -sinf(fTheta);
-        matRotZ.matrix[1][1] = cosf(fTheta);
+        matRotZ.matrix[0][0] = cosf(fTheta * 1.5f);
+        matRotZ.matrix[0][1] = sinf(fTheta * 1.5f);
+        matRotZ.matrix[1][0] = -sinf(fTheta * 1.5f);
+        matRotZ.matrix[1][1] = cosf(fTheta * 1.5f);
         matRotZ.matrix[2][2] = 1;
         matRotZ.matrix[3][3] = 1;
+
+        // Rotation Y
+        matRotY.matrix[0][0] = cos(fTheta);
+        matRotY.matrix[0][2] = sinf(fTheta);
+        matRotY.matrix[1][1] = 1;
+        matRotY.matrix[2][0] = -sinf(fTheta);
+        matRotY.matrix[2][2] = cosf(fTheta);
+        matRotY.matrix[3][3] = 1;
+
 
         // Rotation X
         matRotX.matrix[0][0] = 1;
@@ -74,9 +84,10 @@ int main(int argc, char* argv[])
         {
             Granite::GMath::Polygon triTranslated;
 
-            Granite::GMath::MultiplyMatrixPolygon(polygon, triTranslated, matRotX);
-            //Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotX);
-            Granite::GMath::OffsetPolygonDepth(triTranslated, 2000.f);
+            Granite::GMath::MultiplyMatrixPolygon(polygon, triTranslated, matRotZ);
+            Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotX);
+            //Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotY);
+            Granite::GMath::OffsetPolygonDepth(triTranslated, 2400.f);
 
             Granite::GMath::FVector3 normal, line1, line2, cameraToPoint;
 
