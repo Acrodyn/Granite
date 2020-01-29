@@ -7,3 +7,4 @@
 - Portaj sve što je potrebno u h/cpp format
 - Multithreaded rendering
 - ALPHA CHANNEL!
+- istražiti umiranje pri rubovima

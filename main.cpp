@@ -49,12 +49,6 @@ int main(int argc, char* argv[])
 
         while (SDL_PollEvent(&e))
         {
-            if (e.type == SDL_QUIT) 
-            {
-                SDL_Log("Program quit after %i ticks", e.quit.timestamp);
-                break;
-            }
-       
             if (e.type == SDL_KEYDOWN)
             {
                 if (e.key.keysym.sym == SDLK_q)
@@ -72,6 +66,12 @@ int main(int argc, char* argv[])
                     rotateZ = true;
                 }
             }
+        }
+
+        if (e.type == SDL_QUIT)
+        {
+            SDL_Log("Program quit after %i ticks", e.quit.timestamp);
+            break;
         }
 
         Granite::GGraphics::ClearScreen(Granite::GGraphics::Color::Black);

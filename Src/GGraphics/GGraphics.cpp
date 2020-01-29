@@ -185,6 +185,8 @@ namespace Granite
         const GMath::FVector3* pv1 = &polygon.vertices[1];
         const GMath::FVector3* pv2 = &polygon.vertices[2];
 
+        // kad vec imash polygon, nadji teksturu umjesto colora ;) 
+
         if (pv1->y < pv0->y)
         {
             GUtil::Swap<const GMath::FVector3>(&pv0, &pv1);
