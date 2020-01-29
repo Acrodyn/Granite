@@ -25,8 +25,14 @@ int main(int argc, char* argv[])
 
     mesh = Granite::ModelLoader::Load();
 
+    bool rotateX, rotateY, rotateZ;
+
     while (true)
     {
+        rotateX = false;
+        rotateY = false;
+        rotateZ = false;
+
         endTime = SDL_GetTicks();
         milisecondsPassed = endTime - startTime;
         deltaTime = milisecondsPassed / 1000.f;
@@ -41,11 +47,31 @@ int main(int argc, char* argv[])
             printf("FPS is: %f \n", 1000.f / milisecondsPassed);
         }
 
-        SDL_PollEvent(&e);
-        if (e.type == SDL_QUIT) 
+        while (SDL_PollEvent(&e))
         {
-            SDL_Log("Program quit after %i ticks", e.quit.timestamp);
-            break;
+            if (e.type == SDL_QUIT) 
+            {
+                SDL_Log("Program quit after %i ticks", e.quit.timestamp);
+                break;
+            }
+       
+            if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym == SDLK_q)
+                {
+                    rotateX = true;
+                }
+
+                if (e.key.keysym.sym == SDLK_w)
+                {
+                    rotateY = true;
+                }
+
+                if (e.key.keysym.sym == SDLK_e)
+                {
+                    rotateZ = true;
+                }
+            }
         }
 
         Granite::GGraphics::ClearScreen(Granite::GGraphics::Color::Black);
@@ -55,39 +81,57 @@ int main(int argc, char* argv[])
         Granite::GMath::FMatrix4x4 matRotZ, matRotX, matRotY;
         fTheta += deltaTime;
 
+        float xSpeed = 3.5f;
+        float ySpeed = 3.3f;
+        float zSpeed = 3.4f;
+
         // Rotation Z
-        matRotZ.matrix[0][0] = cosf(fTheta * 1.5f);
-        matRotZ.matrix[0][1] = sinf(fTheta * 1.5f);
-        matRotZ.matrix[1][0] = -sinf(fTheta * 1.5f);
-        matRotZ.matrix[1][1] = cosf(fTheta * 1.5f);
+        matRotZ.matrix[0][0] = cosf(deltaTime * zSpeed);
+        matRotZ.matrix[0][1] = sinf(deltaTime * zSpeed);
+        matRotZ.matrix[1][0] = -sinf(deltaTime * zSpeed);
+        matRotZ.matrix[1][1] = cosf(deltaTime * zSpeed);
         matRotZ.matrix[2][2] = 1;
         matRotZ.matrix[3][3] = 1;
 
         // Rotation Y
-        matRotY.matrix[0][0] = cos(fTheta);
-        matRotY.matrix[0][2] = sinf(fTheta);
+        matRotY.matrix[0][0] = cos(deltaTime * ySpeed);
+        matRotY.matrix[0][2] = sinf(deltaTime * ySpeed);
         matRotY.matrix[1][1] = 1;
-        matRotY.matrix[2][0] = -sinf(fTheta);
-        matRotY.matrix[2][2] = cosf(fTheta);
+        matRotY.matrix[2][0] = -sinf(deltaTime * ySpeed);
+        matRotY.matrix[2][2] = cosf(deltaTime * ySpeed);
         matRotY.matrix[3][3] = 1;
 
 
         // Rotation X
         matRotX.matrix[0][0] = 1;
-        matRotX.matrix[1][1] = cosf(fTheta * 0.5f);
-        matRotX.matrix[1][2] = sinf(fTheta * 0.5f);
-        matRotX.matrix[2][1] = -sinf(fTheta * 0.5f);
-        matRotX.matrix[2][2] = cosf(fTheta * 0.5f);
+        matRotX.matrix[1][1] = cosf(deltaTime * xSpeed);
+        matRotX.matrix[1][2] = sinf(deltaTime * xSpeed);
+        matRotX.matrix[2][1] = -sinf(deltaTime * xSpeed);
+        matRotX.matrix[2][2] = cosf(deltaTime * xSpeed);
         matRotX.matrix[3][3] = 1;
 
         for (auto &polygon : mesh.polygons)
         {
             Granite::GMath::Polygon triTranslated;
 
-            Granite::GMath::MultiplyMatrixPolygon(polygon, triTranslated, matRotZ);
-            Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotX);
-            //Granite::GMath::MultiplyMatrixPolygon(triTranslated, matRotY);
-            Granite::GMath::OffsetPolygonDepth(triTranslated, 2400.f);
+            if (rotateZ)
+            {
+                Granite::GMath::MultiplyMatrixPolygon(polygon, matRotZ);
+            }
+
+            if (rotateX)
+            {
+                Granite::GMath::MultiplyMatrixPolygon(polygon, matRotX);
+            }
+
+            if (rotateY)
+            {
+                Granite::GMath::MultiplyMatrixPolygon(polygon, matRotY);
+            }
+
+            triTranslated = polygon;
+
+            Granite::GMath::OffsetPolygonDepth(triTranslated, 1800.f);
 
             Granite::GMath::FVector3 normal, line1, line2, cameraToPoint;
 
@@ -102,7 +146,6 @@ int main(int argc, char* argv[])
 
             float dotProduct = normal.DotProduct(cameraToPoint);
 
-            // dot product
             if (dotProduct < .0f)
             {
                 // Project triangles from 3D --> 2D
