@@ -244,8 +244,10 @@ namespace Granite
         const float stepZRight = 1.f / (v2.y - v1.y);
 
         // top rule
-        const int yStart = (int)ceil(v0.y - .5f);
-        const int yEnd = (int)ceil(v2.y - .5f);
+        int yStartCeil = (int)ceil(v0.y - .5f);
+        int yEndCeil = (int)ceil(v2.y - .5f);;
+        const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
+        const int yEnd = (yEndCeil > GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT : yEndCeil;
 
         float zTrackerL = 0.f;
         float zTrackerR = 0.f;
@@ -259,8 +261,10 @@ namespace Granite
             const float zR = v1.z * (1.f - zTrackerL) + v2.z * zTrackerL;
 
             // left rule
-            const int xStart = (int)ceil(px0 - .5f);
-            const int xEnd = (int)ceil(px1 - .5f);
+            int xStartCeil = (int)ceil(px0 - .5f);
+            int xEndCeil = (int)ceil(px1 - .5f);
+            const int xStart = (xStartCeil < 0) ? 0 : xStartCeil;
+            const int xEnd = (xEndCeil > GConfig::WINDOW_WIDTH) ? GConfig::WINDOW_WIDTH : xEndCeil;
 
             float z = 0;
             float actualZTracker = 0.f;
@@ -268,11 +272,6 @@ namespace Granite
 
             for (int x = xStart; x < xEnd; ++x)
             {
-                if (x < 0 || x >= GConfig::WINDOW_WIDTH || y < 0 || y >= GConfig::WINDOW_HEIGHT)
-                {
-                    return;
-                }
-
                 z = zL * (1.f - actualZTracker) + zR * actualZTracker;
 
                 if (z < depthBuffer[y * GConfig::WINDOW_WIDTH + x])
@@ -298,8 +297,10 @@ namespace Granite
         const float stepZRight = 1.f / (v2.y - v0.y);
 
         // top rule
-        const int yStart = (int)ceil(v0.y - .5f);
-        const int yEnd = (int)ceil(v2.y - .5f);
+        int yStartCeil = (int)ceil(v0.y - .5f);
+        int yEndCeil = (int)ceil(v2.y - .5f);;
+        const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
+        const int yEnd = (yEndCeil > GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT : yEndCeil;
 
         float zTrackerL = 0.f;
         float zTrackerR = 0.f;
@@ -313,8 +314,10 @@ namespace Granite
             const float zR = v0.z * (1.f - zTrackerL) + v2.z * zTrackerL;
 
             // left rule
-            const int xStart = (int)ceil(px0 - .5f);
-            const int xEnd = (int)ceil(px1 - .5f);
+            int xStartCeil = (int)ceil(px0 - .5f);
+            int xEndCeil = (int)ceil(px1 - .5f);
+            const int xStart = (xStartCeil < 0) ? 0 : xStartCeil;
+            const int xEnd = (xEndCeil > GConfig::WINDOW_WIDTH) ? GConfig::WINDOW_WIDTH : xEndCeil;
 
             float z = 0;
             float actualZTracker = 0.f;
@@ -322,11 +325,6 @@ namespace Granite
 
             for (int x = xStart; x < xEnd; ++x)
             {
-                if (x < 0 || x >= GConfig::WINDOW_WIDTH || y < 0 || y >= GConfig::WINDOW_HEIGHT)
-                {
-                    return;
-                }
-
                 z = zL * (1.f - actualZTracker) + zR * actualZTracker;
 
                 if (z < depthBuffer[y * GConfig::WINDOW_WIDTH + x])

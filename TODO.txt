@@ -8,3 +8,4 @@
 - Multithreaded rendering
 - ALPHA CHANNEL!
 - istražiti umiranje pri rubovima
+- implement lerp method
