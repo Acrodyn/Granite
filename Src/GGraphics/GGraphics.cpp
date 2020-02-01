@@ -1,5 +1,6 @@
 #include "GGraphics/GGraphics.h"
 #include "GUtils/GUtil.h"
+#include "SDL_image.h"
 
 namespace Granite
 {
@@ -20,6 +21,7 @@ namespace Granite
             }
 
             SDL_Init(0);
+            IMG_Init(IMG_INIT_PNG);
 
             surface = SDL_GetWindowSurface(window);
 
@@ -171,33 +173,48 @@ namespace Granite
 
     void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, Pixel color)
     {
-        RasterizeTriangle(polygon, _GetConvertedColor(color));
+        _RasterizeTriangle(polygon, _GetConvertedColor(color));
     }
 
     void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, Color color)
     {
-        RasterizeTriangle(polygon, (Uint32)color);
+        _RasterizeTriangle(polygon, (Uint32)color);
+    }
+
+    void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, GTexture* texture)
+    {
+        _RasterizeTriangle(polygon, (Uint32)Color::Grey, texture);
     }
 
     void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color)
+    {
+        _RasterizeTriangle(polygon, color);
+    }
+
+    void GGraphics::_RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color, GTexture* texture)
     {
         const GMath::FVector3 *pv0 = &polygon.vertices[0];
         const GMath::FVector3* pv1 = &polygon.vertices[1];
         const GMath::FVector3* pv2 = &polygon.vertices[2];
 
-        // kad vec imash polygon, nadji teksturu umjesto colora ;) 
+        const GMath::FVector3* tx0 = &polygon.textureCoordinates[0];
+        const GMath::FVector3* tx1 = &polygon.textureCoordinates[1];
+        const GMath::FVector3* tx2 = &polygon.textureCoordinates[2];
 
         if (pv1->y < pv0->y)
         {
             GUtil::Swap<const GMath::FVector3>(&pv0, &pv1);
+            GUtil::Swap<const GMath::FVector3>(&tx0, &tx1);
         }
         if (pv2->y < pv1->y)
         {
             GUtil::Swap<const GMath::FVector3>(&pv1, &pv2);
+            GUtil::Swap<const GMath::FVector3>(&tx1, &tx2);
         }
         if (pv1->y < pv0->y)
         {
             GUtil::Swap<const GMath::FVector3>(&pv0, &pv1);
+            GUtil::Swap<const GMath::FVector3>(&tx0, &tx1);
         }
 
         if (pv0->y == pv1->y) // flat top
@@ -205,139 +222,155 @@ namespace Granite
             if (pv1->x < pv0->x)
             {
                 GUtil::Swap<const GMath::FVector3>(&pv0, &pv1);
+                GUtil::Swap<const GMath::FVector3>(&tx0, &tx1);
             }
-            _RasterizeFlatTopTriangle(*pv0, *pv1, *pv2, color);
+
+            _RasterizeFlatTopTriangle(pv0, pv1, pv2, tx0, tx1, tx2, color, texture);
         }
         else if (pv1->y == pv2->y) // flat bottom
         {
             if (pv2->x < pv1->x)
             {
                 GUtil::Swap<const GMath::FVector3>(&pv1, &pv2);
+                GUtil::Swap<const GMath::FVector3>(&tx1, &tx2);
             }
 
-            _RasterizeFlatBottomTriangle(*pv0, *pv1, *pv2, color);
+            _RasterizeFlatBottomTriangle(pv0, pv1, pv2, tx0, tx1, tx2, color, texture);
         }
         else // non flat triangle
         {
-            const float t = (pv1->y - pv0->y) / (pv2->y - pv0->y);
-            const GMath::FVector3 vi = *pv0 + (*pv2 - *pv0) * t;
+            const float vertexSlice = (pv1->y - pv0->y) / GUtil::Abs((pv2->y - pv0->y));
+            const GMath::FVector3 vi = *pv0 + (*pv2 - *pv0) * vertexSlice;
+
+            const float texelSlice = (tx1->y - tx0->y) / GUtil::Abs((pv2->y - pv0->y));
+            const GMath::FVector3 ti = *tx0 + (*tx2 - *tx0) * texelSlice;
 
             if (pv1->x < vi.x) // major right
             {
-                _RasterizeFlatBottomTriangle(*pv0, *pv1, vi, color);
-                _RasterizeFlatTopTriangle(*pv1, vi, *pv2, color);
+                _RasterizeFlatTopTriangle(pv1, &vi, pv2, tx1, &ti, tx2, color, texture);
+                _RasterizeFlatBottomTriangle(pv0, pv1, &vi, tx0, tx1, &ti, color, texture);
             }
             else // major left
             {
-                _RasterizeFlatBottomTriangle(*pv0, vi, *pv1, color);
-                _RasterizeFlatTopTriangle(vi, *pv1, *pv2, color);
+                _RasterizeFlatTopTriangle(&vi, pv1, pv2, &ti, tx1, tx2, color, texture);
+                _RasterizeFlatBottomTriangle(pv0, &vi, pv1, tx0, &ti, tx1, color, texture);
             }
         } 
     }
 
-    void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3 &v0, const GMath::FVector3& v1, const GMath::FVector3& v2,  Uint32 color)
+    void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture)
     {
-        float slope0 = (v2.x - v0.x) / (v2.y - v0.y);
-        float slope1 = (v2.x - v1.x) / (v2.y - v1.y);
+        float slope0 = (v2->x - v0->x) / (v2->y - v0->y);
+        float slope1 = (v2->x - v1->x) / (v2->y - v1->y);
 
-        const float stepZLeft = 1.f / (v2.y - v0.y);
-        const float stepZRight = 1.f / (v2.y - v1.y);
+        const float depthStep = 1.f / (v2->y - v0->y); // modify?
+        const float texelStepL = (tx2->y - tx0->y) / (v2->y - v0->y);
+        const float texelStepR = (tx2->y - tx1->y) / (v2->y - v1->y);
 
         // top rule
-        int yStartCeil = (int)ceil(v0.y - .5f);
-        int yEndCeil = (int)ceil(v2.y - .5f);;
+        int yStartCeil = (int)ceil(v0->y - .5f);
+        int yEndCeil = (int)ceil(v2->y - .5f);;
         const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
         const int yEnd = (yEndCeil > GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT : yEndCeil;
 
-        float zTrackerL = 0.f;
-        float zTrackerR = 0.f;
+        float zTracker = 0.f;
+        float texTrackerL = 0.f;
+        float texTrackerR = 0.f;
 
         for (int y = yStart; y < yEnd; ++y)
         {
-            const float px0 = v0.x + slope0 * (float(y) + .5f - v0.y);
-            const float px1 = v1.x + slope1 * (float(y) + .5f - v1.y);
+            const float px0 = v0->x + slope0 * (float(y) + .5f - v0->y);
+            const float px1 = v1->x + slope1 * (float(y) + .5f - v1->y);
 
-            const float zL = v0.z * (1.f - zTrackerL) + v1.z * zTrackerL;
-            const float zR = v1.z * (1.f - zTrackerL) + v2.z * zTrackerL;
+            const float zL = GUtil::GInterpolate(v0->z, v1->z, zTracker);
+            const float zR = GUtil::GInterpolate(v1->z, v2->z, zTracker);
 
-            // left rule
-            int xStartCeil = (int)ceil(px0 - .5f);
-            int xEndCeil = (int)ceil(px1 - .5f);
-            const int xStart = (xStartCeil < 0) ? 0 : xStartCeil;
-            const int xEnd = (xEndCeil > GConfig::WINDOW_WIDTH) ? GConfig::WINDOW_WIDTH : xEndCeil;
+            const float tL = GUtil::GInterpolate(tx0->y, tx2->y, texelStepL);
+            const float tR = GUtil::GInterpolate(tx1->y, tx2->y, texelStepR);
 
-            float z = 0;
-            float actualZTracker = 0.f;
-            float stepZRight = 1.f / (px1 - px0);
+            _Scanline(y, px0, px1, zL, zR, tL, tR, color, texture);
 
-            for (int x = xStart; x < xEnd; ++x)
-            {
-                z = zL * (1.f - actualZTracker) + zR * actualZTracker;
-
-                if (z < depthBuffer[y * GConfig::WINDOW_WIDTH + x])
-                {
-                    depthBuffer[y * GConfig::WINDOW_WIDTH + x] = z;
-                    SetPixel(x, y, color);
-                }
-
-                actualZTracker += stepZRight;
-            }
-
-            zTrackerL += stepZLeft;
-            zTrackerR += stepZRight;
+            zTracker += depthStep;
+            texTrackerL += texelStepL;
+            texTrackerR += texelStepR;
         }
     }
 
-    void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Uint32 color)
+    void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture)
     {
-        float slope0 = (v1.x - v0.x) / (v1.y - v0.y);
-        float slope1 = (v2.x - v0.x) / (v2.y - v0.y);
+        float slope0 = (v1->x - v0->x) / (v1->y - v0->y);
+        float slope1 = (v2->x - v0->x) / (v2->y - v0->y);
 
-        const float stepZLeft = 1.f / (v1.y - v0.y);
-        const float stepZRight = 1.f / (v2.y - v0.y);
+        const float stepZ = 1.f / (v1->y - v0->y);
+
+        const float stepTexelL = (tx1->y - tx0->y) / (v1->y - v0->y);
+        const float stepTexelR = (tx2->y - tx0->y) / (v2->y - v0->y);
 
         // top rule
-        int yStartCeil = (int)ceil(v0.y - .5f);
-        int yEndCeil = (int)ceil(v2.y - .5f);;
+        int yStartCeil = (int)ceil(v0->y - .5f);
+        int yEndCeil = (int)ceil(v2->y - .5f);;
         const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
         const int yEnd = (yEndCeil > GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT : yEndCeil;
 
-        float zTrackerL = 0.f;
-        float zTrackerR = 0.f;
+        float zTracker = 0.f;
+        float texTrackerL = 0.f;
+        float texTrackerR = 0.f;
 
         for (int y = yStart; y < yEnd; ++y)
         {
-            const float px0 = v0.x + slope0 * (float(y) + .5f - v0.y);
-            const float px1 = v0.x + slope1 * (float(y) + .5f - v0.y);
+            const float px0 = v0->x + slope0 * (float(y) + .5f - v0->y);
+            const float px1 = v0->x + slope1 * (float(y) + .5f - v0->y);
 
-            const float zL = v0.z * (1.f - zTrackerL) + v1.z * zTrackerL;
-            const float zR = v0.z * (1.f - zTrackerL) + v2.z * zTrackerL;
+            const float zL = GUtil::GInterpolate(v0->z, v1->z, zTracker);
+            const float zR = GUtil::GInterpolate(v0->z, v2->z, zTracker);
 
-            // left rule
-            int xStartCeil = (int)ceil(px0 - .5f);
-            int xEndCeil = (int)ceil(px1 - .5f);
-            const int xStart = (xStartCeil < 0) ? 0 : xStartCeil;
-            const int xEnd = (xEndCeil > GConfig::WINDOW_WIDTH) ? GConfig::WINDOW_WIDTH : xEndCeil;
+            const float tL = GUtil::GInterpolate(tx0->y, tx1->y, texTrackerL);
+            const float tR = GUtil::GInterpolate(tx0->y, tx2->y, texTrackerR);
 
-            float z = 0;
-            float actualZTracker = 0.f;
-            float stepZRight = 1.f / (px1 - px0);
+            _Scanline(y, px0, px1, zL, zR, tL, tR, color, texture);
 
-            for (int x = xStart; x < xEnd; ++x)
+            zTracker += stepZ;
+            texTrackerL += stepTexelL;
+            texTrackerR += stepTexelR;
+        }
+    }
+
+    void GGraphics::_Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, float firstTexel, float lastTexel, Uint32 color, GTexture* texture)
+    {
+        int xStartCeil = (int)ceil(firstPixel - .5f);
+        int xEndCeil = (int)ceil(lastPixel - .5f);
+        const int xStart = (xStartCeil < 0) ? 0 : xStartCeil;
+        const int xEnd = (xEndCeil > GConfig::WINDOW_WIDTH) ? GConfig::WINDOW_WIDTH : xEndCeil;
+
+        float z = 0.f;
+        float actualZTracker = 0.f;
+        float texTracker = 0.f;
+
+        float stepZRight = 1.f / (lastPixel - firstPixel);
+        float stepTexel = (lastTexel - firstTexel) / (lastPixel - firstPixel);
+
+        float tex = 0.f;
+
+        for (int x = xStart; x < xEnd; ++x)
+        {
+            z = GUtil::GInterpolate(firstPixelZ, lastPixelZ, actualZTracker);
+
+            if (texture != nullptr)
             {
-                z = zL * (1.f - actualZTracker) + zR * actualZTracker;
+                tex = GUtil::GInterpolate(firstTexel, lastTexel, texTracker);
+                int position = tex * texture->textureData->w * texture->textureData->h;
 
-                if (z < depthBuffer[y * GConfig::WINDOW_WIDTH + x])
-                {
-                    depthBuffer[y * GConfig::WINDOW_WIDTH + x] = z;
-                    SetPixel(x, y, color);
-                }
-               
-                actualZTracker += stepZRight;
+                color = *((Uint32*)texture->textureData->pixels + position);
+                texTracker += stepTexel;
             }
 
-            zTrackerL += stepZLeft;
-            zTrackerR += stepZRight;
+            if (z < depthBuffer[row * GConfig::WINDOW_WIDTH + x])
+            {
+                depthBuffer[row * GConfig::WINDOW_WIDTH + x] = z;
+                SetPixel(x, row, color);
+            }
+
+            actualZTracker += stepZRight;
         }
     }
 }

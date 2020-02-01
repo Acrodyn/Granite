@@ -28,7 +28,6 @@ namespace Granite
             for (int i = 0; i < 3; ++i)
             {
                 polygon.vertices[i] = MultiplyMatrixVector(polygon.vertices[i], matrix);
-                polygon.textureCoordinates[i] = MultiplyMatrixVector(polygon.textureCoordinates[i], matrix);
                 // polygon.normals[i] = MultiplyMatrixVector(polygon.normals[i], matrix);
             }
         }
@@ -38,7 +37,6 @@ namespace Granite
             for (int i = 0; i < 3; ++i)
             {
                 oPolygon.vertices[i] = MultiplyMatrixVector(iPolygon.vertices[i], matrix);
-                oPolygon.textureCoordinates[i] = MultiplyMatrixVector(iPolygon.textureCoordinates[i], matrix);
                 //oPolygon.normals[i] = MultiplyMatrixVector(iPolygon.normals[i], matrix);
             }
         }
@@ -48,9 +46,6 @@ namespace Granite
             for (int i = 0; i < 3; ++i)
             {
                 oTriangle.vertices[i].z = oTriangle.vertices[i].z + offset;
-                
-                
-                oTriangle.textureCoordinates[i].z = oTriangle.textureCoordinates[i].z + offset;
                 //oTriangle.normals[i].z = oTriangle.normals[i].z + offset;
             }
         }

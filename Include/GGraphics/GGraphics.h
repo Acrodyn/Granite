@@ -4,19 +4,22 @@
 #include "GMath/GMath.h"
 #include "GUtils/GConfig.h"
 #include "GModelLoader.h"
+#include "GTexture.h"
 
 namespace Granite
 {
-	
-class GGraphics
+    class GGraphics
 	{
     public:
+        class Triangle;
+
         enum class Color {
             Red = 0xFF0000,
             Green = 0x00FF00,
             Blue = 0x0000FF,
             White = 0xFFFFFF,
             Black = 0x000000,
+            Grey = 0x808080
         };
 
         // its own class!
@@ -61,6 +64,7 @@ class GGraphics
         static void RasterizeTriangle(const GMath::Polygon& polygon, Pixel color);
         static void RasterizeTriangle(const GMath::Polygon& polygon, Color color);
         static void RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color);
+        static void RasterizeTriangle(const GMath::Polygon& polygon, GTexture* texture = nullptr);
 
         static enum Color GetRandomColor()
         {
@@ -79,8 +83,10 @@ class GGraphics
         static SDL_Window* window;
         static float* depthBuffer;
 
-        static void _RasterizeFlatTopTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Uint32 color);
-        static void _RasterizeFlatBottomTriangle(const GMath::FVector3& v0, const GMath::FVector3& v1, const GMath::FVector3& v2, Uint32 color);
+        static void _RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color = 0, GTexture* texture = nullptr);
+        static void _RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture = nullptr);
+        static void _RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture = nullptr);
+        static void _Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, float firstTexel, float lastTexel, Uint32 color, GTexture* texture = nullptr);
        
         static Uint32 _GetConvertedColor(Color color)
         {

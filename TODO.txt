@@ -9,3 +9,7 @@
 - ALPHA CHANNEL!
 - istražiti umiranje pri rubovima
 - implement lerp method
+- dodat W u vec3D?
+- napravi Vec2, za teksture
+- joj ej plz stavi sve zvijezdice na - ISPRAVNO - mjesto :P
+- ubi sve normale iz mesha, ne trebaju nam

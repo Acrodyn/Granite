@@ -80,6 +80,12 @@
     <ClInclude Include="Include\GMath\Polygon.h">
       <Filter>Header Files\GMath</Filter>
     </ClInclude>
+    <ClInclude Include="Include\GGraphics\GTexture.h">
+      <Filter>Header Files\GGraphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GMath\Triangle.h">
+      <Filter>Header Files\GMath</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODO.txt">

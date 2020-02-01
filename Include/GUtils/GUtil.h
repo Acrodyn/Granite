@@ -27,5 +27,7 @@ namespace Granite
             *a = *b;
             *b = temp;
         }
+
+        float GInterpolate(float start, float end, float t);
     }
 }

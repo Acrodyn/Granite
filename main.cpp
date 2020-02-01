@@ -4,6 +4,7 @@
 #include "GUtils/GConfig.h"
 #include "GGraphics/GModelLoader.h"
 #include "GGraphics/GGraphics.h"
+#include "GGraphics/GTexture.h"
 
 int main(int argc, char* argv[])
 {
@@ -24,6 +25,7 @@ int main(int argc, char* argv[])
     Granite::GMath::FVector3 camera;
 
     mesh = Granite::ModelLoader::Load();
+    Granite::GTexture tex("JessTex.png");
 
     bool rotateX, rotateY, rotateZ;
 
@@ -85,6 +87,7 @@ int main(int argc, char* argv[])
         float ySpeed = 3.3f;
         float zSpeed = 3.4f;
 
+        // dodaj rotacije u funkcije or something
         // Rotation Z
         matRotZ.matrix[0][0] = cosf(deltaTime * zSpeed);
         matRotZ.matrix[0][1] = sinf(deltaTime * zSpeed);
@@ -177,8 +180,8 @@ int main(int argc, char* argv[])
                     Granite::GGraphics::Pixel newColor(128, 128, 128);
                     float intensity = Granite::GUtil::Abs(dotProduct);
                     newColor.SetIntensity(intensity);
-                    Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
-                    //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::Color::Green);
+                    Granite::GGraphics::RasterizeTriangle(triTranslated, &tex);
+                   //Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
                     //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::GetRandomColor());
                 }
             }
