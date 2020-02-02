@@ -48,6 +48,74 @@ namespace Granite
             }
         };
 
+        class TextureCoordinates
+        {
+        public:
+            float u;
+            float v;
+
+            TextureCoordinates(float u, float v)
+            {
+                this->u = u;
+                this->v = v;
+            }
+
+            TextureCoordinates& operator*=(float value)
+            {
+                u *= value;
+                v *= value;
+
+                return *this;
+            }
+
+            TextureCoordinates operator*(float value)
+            {
+                return TextureCoordinates(u * value, v * value);
+            }
+
+            TextureCoordinates& operator+=(float value)
+            {
+                u += value;
+                v += value;
+
+                return *this;
+            }
+
+            TextureCoordinates& operator+=(const TextureCoordinates& other)
+            {
+                u += other.u;
+                v += other.v;
+
+                return *this;
+            }
+
+            TextureCoordinates& operator-=(float value)
+            {
+                u -= value;
+                v -= value;
+
+                return *this;
+            }
+
+            TextureCoordinates operator-(const TextureCoordinates &other)
+            {
+                return TextureCoordinates(u - other.u, v - other.v);
+            }
+
+            TextureCoordinates& operator/=(float value)
+            {
+                u /= value;
+                v /= value;
+
+                return *this;
+            }
+
+            TextureCoordinates operator/(float value)
+            {
+                return TextureCoordinates(u / value, v / value);
+            }
+        };
+
         static void InitGraphics();
         static void DestroyGraphics();
         static void UpdateScreen();
@@ -55,6 +123,7 @@ namespace Granite
         static GMath::FMatrix4x4 GetProjectionMatrix();
         static void ClearScreen(Color clearColor);
         static void ClearDepthBuffer();
+        static Uint32 GetPixel(SDL_Surface* textureData, int x, int y);
         static void SetPixel(int x, int y, Pixel color);
         static void SetPixel(int x, int y, Color color);
         static void SetPixel(int x, int y, Uint32 color); // private, maybe?
@@ -86,7 +155,7 @@ namespace Granite
         static void _RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color = 0, GTexture* texture = nullptr);
         static void _RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture = nullptr);
         static void _RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture = nullptr);
-        static void _Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, float firstTexel, float lastTexel, Uint32 color, GTexture* texture = nullptr);
+        static void _Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, TextureCoordinates firstTexel, TextureCoordinates lastTexel, Uint32 color, GTexture* texture = nullptr);
        
         static Uint32 _GetConvertedColor(Color color)
         {

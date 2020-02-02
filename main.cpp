@@ -180,8 +180,9 @@ int main(int argc, char* argv[])
                     Granite::GGraphics::Pixel newColor(128, 128, 128);
                     float intensity = Granite::GUtil::Abs(dotProduct);
                     newColor.SetIntensity(intensity);
-                    Granite::GGraphics::RasterizeTriangle(triTranslated, &tex);
-                   //Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
+                    //Granite::GGraphics::GetPixel(tex.textureData, 1000, 100000);
+                     Granite::GGraphics::RasterizeTriangle(triTranslated, &tex);
+                     //Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
                     //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::GetRandomColor());
                 }
             }

@@ -13,6 +13,12 @@ namespace Granite
         }
 
         template <typename T>
+        T Min(T number1, T number2)
+        {
+            return (number1 < number2) ? number1 : number2;
+        }
+
+        template <typename T>
         void Swap(T &a, T &b)
         {
             T temp = a;

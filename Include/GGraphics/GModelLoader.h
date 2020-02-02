@@ -95,9 +95,13 @@ namespace Granite
 			std::string value;
 			lineData >> data;
 
-			GMath::FVector3 vertexIndices[3];
-			GMath::FVector3 textureIndices[3];
-			GMath::FVector3 normalIndices[3];
+			/*GMath::FVector3 vertexIndices[4];
+			GMath::FVector3 textureIndices[4];
+			GMath::FVector3 normalIndices[4];*/
+
+			std::vector<GMath::FVector3> vertexIndices;
+			std::vector<GMath::FVector3> textureIndices;
+			std::vector<GMath::FVector3> normalIndices;
 
 			while (lineData >> data)
 			{
@@ -110,15 +114,18 @@ namespace Granite
 					{
 						switch (phase)
 						{
-						case 0:
-							vertexIndices[dataCountIndex].SetData(vertices.at(std::stoi(value) - 1));
-							break;
-						case 1:
-							textureIndices[dataCountIndex].SetData(textureCoords.at(std::stoi(value) - 1));
-							break;
-						case 2:
-							normalIndices[dataCountIndex].SetData(normals.at(std::stoi(value) - 1));
-							break;
+							case 0:
+								vertexIndices.push_back(vertices.at(std::stoi(value) - 1));
+								//vertexIndices[dataCountIndex].SetData(vertices.at(std::stoi(value) - 1));
+								break;
+							case 1:
+								textureIndices.push_back(textureCoords.at(std::stoi(value) - 1));
+								//textureIndices[dataCountIndex].SetData(textureCoords.at(std::stoi(value) - 1));
+								break;
+							case 2:
+								normalIndices.push_back(normals.at(std::stoi(value) - 1));
+								//normalIndices[dataCountIndex].SetData(normals.at(std::stoi(value) - 1));
+								break;
 						}
 					}
 					++phase;
@@ -126,7 +133,31 @@ namespace Granite
 				++dataCountIndex;
 			}
 
-			mesh.AddPolygon(vertexIndices, textureIndices, normalIndices);
+			// triangulate
+			while (dataCountIndex >= 3)
+			{
+				GMath::FVector3 vertexIndicesArr[3];
+				GMath::FVector3 textureIndicesArr[3];
+				GMath::FVector3 normalIndicesArr[3];
+
+				int triangleFirst = dataCountIndex - 3;
+				int triangleLast = dataCountIndex - 1;
+
+				for (int vi = dataCountIndex - 1, ai = 2; ai > 0; --vi, --ai)
+				{
+					vertexIndicesArr[ai] = vertexIndices[vi];
+					textureIndicesArr[ai] = textureIndices[vi];
+					normalIndicesArr[ai] = normalIndices[vi];
+				}
+
+				vertexIndicesArr[0] = vertexIndices[0];
+				textureIndicesArr[0] = textureIndices[0];
+				normalIndicesArr[0] = normalIndices[0];
+
+				mesh.AddPolygon(vertexIndicesArr, textureIndicesArr, normalIndicesArr);
+
+				--dataCountIndex;;
+			}
 		}
 	};
 }

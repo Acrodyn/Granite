@@ -21,7 +21,7 @@ namespace Granite
             }
 
             SDL_Init(0);
-            IMG_Init(IMG_INIT_PNG);
+            IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
 
             surface = SDL_GetWindowSurface(window);
 
@@ -86,6 +86,29 @@ namespace Granite
         }
     }
 
+    Uint32 GGraphics::GetPixel(SDL_Surface* textureData, int x, int y)
+    {
+        int bpp = textureData->format->BytesPerPixel;
+        Uint8* p = (Uint8*)textureData->pixels + y * textureData->pitch + x * bpp;
+
+        switch (bpp) 
+        {
+        case 1:
+            return *p;
+        case 2:
+            return *(Uint16*)p;
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                return p[0] << 16 | p[1] << 8 | p[2];
+            else
+                return p[0] | p[1] << 8 | p[2] << 16;
+        case 4:
+            return *(Uint32*)p;
+        default:
+            return 0;
+        }
+    }
+
     void GGraphics::SetPixel(int x, int y, Color color)
     {
         SetPixel(x, y, (Uint32)color);
@@ -103,9 +126,33 @@ namespace Granite
             return;
         }
 
-        // Uint8 alpha = ((color & 0xFF000000) >> 24); not currently relevant
+        int bpp = surface->format->BytesPerPixel;
+        Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 
-        *((Uint32*)surface->pixels + (y * surface->w) + x) = (Uint32)color;
+        switch (bpp) 
+        {
+        case 1:
+            *p = color;
+            break;
+        case 2:
+            *(Uint16*)p = color;
+            break;
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+                p[0] = (color >> 16) & 0xff;
+                p[1] = (color >> 8) & 0xff;
+                p[2] = color & 0xff;
+            }
+            else {
+                p[0] = color & 0xff;
+                p[1] = (color >> 8) & 0xff;
+                p[2] = (color >> 16) & 0xff;
+            }
+            break;
+        case 4:
+            *(Uint32*)p = color;
+            break;
+        }
     }
 
     // Bresenham’s Line Drawing Algorithm
@@ -239,11 +286,11 @@ namespace Granite
         }
         else // non flat triangle
         {
-            const float vertexSlice = (pv1->y - pv0->y) / GUtil::Abs((pv2->y - pv0->y));
+            const float vertexSlice = (pv1->y - pv0->y) / (pv2->y - pv0->y);
             const GMath::FVector3 vi = *pv0 + (*pv2 - *pv0) * vertexSlice;
 
-            const float texelSlice = (tx1->y - tx0->y) / GUtil::Abs((pv2->y - pv0->y));
-            const GMath::FVector3 ti = *tx0 + (*tx2 - *tx0) * texelSlice;
+            //const float texelSlice = (tx1->y - tx0->y) / (pv2->y - pv0->y);
+            const GMath::FVector3 ti = *tx0 + (*tx2 - *tx0) * vertexSlice;
 
             if (pv1->x < vi.x) // major right
             {
@@ -260,22 +307,33 @@ namespace Granite
 
     void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture)
     {
-        float slope0 = (v2->x - v0->x) / (v2->y - v0->y);
-        float slope1 = (v2->x - v1->x) / (v2->y - v1->y);
-
-        const float depthStep = 1.f / (v2->y - v0->y); // modify?
-        const float texelStepL = (tx2->y - tx0->y) / (v2->y - v0->y);
-        const float texelStepR = (tx2->y - tx1->y) / (v2->y - v1->y);
-
         // top rule
         int yStartCeil = (int)ceil(v0->y - .5f);
         int yEndCeil = (int)ceil(v2->y - .5f);;
         const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
-        const int yEnd = (yEndCeil > GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT : yEndCeil;
+        const int yEnd = (yEndCeil >= GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT - 1 : yEndCeil;
+
+        float slope0 = (v2->x - v0->x) / (v2->y - v0->y);
+        float slope1 = (v2->x - v1->x) / (v2->y - v1->y);
+
+        const float depthStep = 1.f / (v2->y - v0->y); // modify?
+
+        /*const float texelStepL = (tx2->y - tx0->y) / (v2->y - v0->y);
+        const float texelStepR = (tx2->y - tx1->y) / (v2->y - v1->y);*/
+
+        TextureCoordinates tL(tx0->x, tx0->y);
+        TextureCoordinates tR(tx1->x, tx1->y);
+        TextureCoordinates tB(tx2->x, tx2->y);
+
+        TextureCoordinates texelStepL = (tB - tL) / (v2->y - v0->y);
+        TextureCoordinates texelStepR = (tB - tR) / (v2->y - v1->y);
+
+        // prestep
+        float prestep = float(yStart) + .5f - v1->y;
+        tL += (texelStepL * prestep);
+        tR += (texelStepR * prestep);
 
         float zTracker = 0.f;
-        float texTrackerL = 0.f;
-        float texTrackerR = 0.f;
 
         for (int y = yStart; y < yEnd; ++y)
         {
@@ -285,32 +343,48 @@ namespace Granite
             const float zL = GUtil::GInterpolate(v0->z, v1->z, zTracker);
             const float zR = GUtil::GInterpolate(v1->z, v2->z, zTracker);
 
-            const float tL = GUtil::GInterpolate(tx0->y, tx2->y, texelStepL);
-            const float tR = GUtil::GInterpolate(tx1->y, tx2->y, texelStepR);
+           /* const float tL = GUtil::GInterpolate(tx0->y, tx2->y, texelStepL);
+            const float tR = GUtil::GInterpolate(tx1->y, tx2->y, texelStepR);*/
 
             _Scanline(y, px0, px1, zL, zR, tL, tR, color, texture);
 
             zTracker += depthStep;
-            texTrackerL += texelStepL;
-            texTrackerR += texelStepR;
+
+            tL += texelStepL;
+            tR += texelStepR;
+            /*texTrackerL += texelStepL;
+            texTrackerR += texelStepR;*/
         }
     }
 
     void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture)
     {
+        // top rule
+        int yStartCeil = (int)ceil(v0->y - .5f);
+        int yEndCeil = (int)ceil(v2->y - .5f);
+        const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
+        const int yEnd = (yEndCeil >= GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT - 1: yEndCeil;
+
         float slope0 = (v1->x - v0->x) / (v1->y - v0->y);
         float slope1 = (v2->x - v0->x) / (v2->y - v0->y);
 
         const float stepZ = 1.f / (v1->y - v0->y);
 
-        const float stepTexelL = (tx1->y - tx0->y) / (v1->y - v0->y);
-        const float stepTexelR = (tx2->y - tx0->y) / (v2->y - v0->y);
+      /*  const float stepTexelL = (tx1->y - tx0->y) / (v1->y - v0->y);
+        const float stepTexelR = (tx2->y - tx0->y) / (v2->y - v0->y);*/
 
-        // top rule
-        int yStartCeil = (int)ceil(v0->y - .5f);
-        int yEndCeil = (int)ceil(v2->y - .5f);;
-        const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
-        const int yEnd = (yEndCeil > GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT : yEndCeil;
+        TextureCoordinates tTL(tx0->x, tx0->y);
+        TextureCoordinates tTR(tx0->x, tx0->y);
+        TextureCoordinates tBL(tx1->x, tx1->y);
+        TextureCoordinates tBR(tx2->x, tx2->y);
+
+        TextureCoordinates texelStepL = (tBL - tTL) / (v1->y - v0->y);
+        TextureCoordinates texelStepR = (tBR - tTR) / (v2->y - v0->y);
+
+        // prestep
+        float prestep = float(yStart) + .5f - v0->y;
+        tTL += (texelStepL * prestep);
+        tTR += (texelStepR * prestep);
 
         float zTracker = 0.f;
         float texTrackerL = 0.f;
@@ -324,48 +398,47 @@ namespace Granite
             const float zL = GUtil::GInterpolate(v0->z, v1->z, zTracker);
             const float zR = GUtil::GInterpolate(v0->z, v2->z, zTracker);
 
-            const float tL = GUtil::GInterpolate(tx0->y, tx1->y, texTrackerL);
-            const float tR = GUtil::GInterpolate(tx0->y, tx2->y, texTrackerR);
+            /*const float tL = GUtil::GInterpolate(tx0->y, tx1->y, texTrackerL);
+            const float tR = GUtil::GInterpolate(tx0->y, tx2->y, texTrackerR);*/
 
-            _Scanline(y, px0, px1, zL, zR, tL, tR, color, texture);
+            _Scanline(y, px0, px1, zL, zR, tTL, tTR, color, texture);
 
             zTracker += stepZ;
-            texTrackerL += stepTexelL;
-            texTrackerR += stepTexelR;
+            tTL += texelStepL;
+            tTR += texelStepR;
         }
     }
 
-    void GGraphics::_Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, float firstTexel, float lastTexel, Uint32 color, GTexture* texture)
+    void GGraphics::_Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, TextureCoordinates firstTexel, TextureCoordinates lastTexel, Uint32 color, GTexture* texture)
     {
         int xStartCeil = (int)ceil(firstPixel - .5f);
         int xEndCeil = (int)ceil(lastPixel - .5f);
         const int xStart = (xStartCeil < 0) ? 0 : xStartCeil;
-        const int xEnd = (xEndCeil > GConfig::WINDOW_WIDTH) ? GConfig::WINDOW_WIDTH : xEndCeil;
+        const int xEnd = (xEndCeil >= GConfig::WINDOW_WIDTH) ? GConfig::WINDOW_WIDTH - 1: xEndCeil;
 
         float z = 0.f;
         float actualZTracker = 0.f;
-        float texTracker = 0.f;
 
-        float stepZRight = 1.f / (lastPixel - firstPixel);
-        float stepTexel = (lastTexel - firstTexel) / (lastPixel - firstPixel);
+        float stepZRight = 1.f / (xEnd - xStart);
+        TextureCoordinates stepTexel = (lastTexel - firstTexel) / (xEnd - xStart);
 
-        float tex = 0.f;
+        // prestep
+        firstTexel += (stepTexel * ((float)xStart + .5f - xStart));
 
         for (int x = xStart; x < xEnd; ++x)
         {
             z = GUtil::GInterpolate(firstPixelZ, lastPixelZ, actualZTracker);
 
-            if (texture != nullptr)
-            {
-                tex = GUtil::GInterpolate(firstTexel, lastTexel, texTracker);
-                int position = tex * texture->textureData->w * texture->textureData->h;
-
-                color = *((Uint32*)texture->textureData->pixels + position);
-                texTracker += stepTexel;
-            }
-
             if (z < depthBuffer[row * GConfig::WINDOW_WIDTH + x])
             {
+                if (texture != nullptr)
+                {
+                    int texelPositionX = GUtil::Min((int)(firstTexel.u * texture->textureData->w), texture->textureData->w - 1);
+                    int texelPositionY = GUtil::Min((int)(firstTexel.v * texture->textureData->h), texture->textureData->h - 1);
+                    int texelPosition = (texelPositionY * texture->textureData->w) + texelPositionX;
+                    color = GetPixel(texture->textureData, texelPositionX, texelPositionY);
+                    firstTexel += stepTexel;
+                }
                 depthBuffer[row * GConfig::WINDOW_WIDTH + x] = z;
                 SetPixel(x, row, color);
             }

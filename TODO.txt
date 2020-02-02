@@ -13,3 +13,4 @@
 - napravi Vec2, za teksture
 - joj ej plz stavi sve zvijezdice na - ISPRAVNO - mjesto :P
 - ubi sve normale iz mesha, ne trebaju nam
+- Position vertex?
