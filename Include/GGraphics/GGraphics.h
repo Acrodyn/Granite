@@ -120,6 +120,7 @@ namespace Granite
         static void DestroyGraphics();
         static void UpdateScreen();
 
+        static int InvertSurfaceVertically(SDL_Surface* surface);
         static GMath::FMatrix4x4 GetProjectionMatrix();
         static void ClearScreen(Color clearColor);
         static void ClearDepthBuffer();
@@ -147,8 +148,8 @@ namespace Granite
             return (Color)color;
         }
 
-    private:
         static SDL_Surface* surface;
+    private:
         static SDL_Window* window;
         static float* depthBuffer;
 

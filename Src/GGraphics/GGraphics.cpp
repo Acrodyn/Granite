@@ -2,6 +2,9 @@
 #include "GUtils/GUtil.h"
 #include "SDL_image.h"
 
+#define SDL_LOCKIFMUST(s) (SDL_MUSTLOCK(s) ? SDL_LockSurface(s) : 0)
+#define SDL_UNLOCKIFMUST(s) { if(SDL_MUSTLOCK(s)) SDL_UnlockSurface(s); }
+
 namespace Granite
 {
 	SDL_Window* GGraphics::window = nullptr;
@@ -37,6 +40,60 @@ namespace Granite
     void GGraphics::UpdateScreen()
     {
         SDL_UpdateWindowSurface(window);
+    }
+
+    // rewrite this or find the alternative
+    int GGraphics::InvertSurfaceVertically(SDL_Surface* surface)
+    {
+        Uint8* t;
+        register Uint8* a, * b;
+        Uint8* last;
+        register Uint16 pitch;
+
+        if (SDL_LOCKIFMUST(surface) < 0)
+            return -2;
+
+        /* do nothing unless at least two lines */
+        if (surface->h < 2) {
+            SDL_UNLOCKIFMUST(surface);
+            return 0;
+        }
+
+        /* get a place to store a line */
+        pitch = surface->pitch;
+        t = (Uint8*)malloc(pitch);
+
+        if (t == NULL) {
+            SDL_UNLOCKIFMUST(surface);
+            return -2;
+        }
+
+        /* get first line; it's about to be trampled */
+        memcpy(t, surface->pixels, pitch);
+
+        /* now, shuffle the rest so it's almost correct */
+        a = (Uint8*)surface->pixels;
+        last = a + pitch * (surface->h - 1);
+        b = last;
+
+        while (a < b) {
+            memcpy(a, b, pitch);
+            a += pitch;
+            memcpy(b, a, pitch);
+            b -= pitch;
+        }
+
+        /* in this shuffled state, the bottom slice is too far down */
+        memmove(b, b + pitch, last - b);
+
+        /* now we can put back that first row--in the last place */
+        memcpy(last, t, pitch);
+
+        /* everything is in the right place; close up. */
+        free(t);
+        SDL_UNLOCKIFMUST(surface);
+
+        return 0;
     }
 
     GMath::FMatrix4x4 GGraphics::GetProjectionMatrix()
@@ -103,7 +160,11 @@ namespace Granite
             else
                 return p[0] | p[1] << 8 | p[2] << 16;
         case 4:
-            return *(Uint32*)p;
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                return *(Uint32*)p;
+            else
+                return *(Uint32*)p;
+            //return *(Uint32*)p;
         default:
             return 0;
         }
@@ -318,9 +379,6 @@ namespace Granite
 
         const float depthStep = 1.f / (v2->y - v0->y); // modify?
 
-        /*const float texelStepL = (tx2->y - tx0->y) / (v2->y - v0->y);
-        const float texelStepR = (tx2->y - tx1->y) / (v2->y - v1->y);*/
-
         TextureCoordinates tL(tx0->x, tx0->y);
         TextureCoordinates tR(tx1->x, tx1->y);
         TextureCoordinates tB(tx2->x, tx2->y);
@@ -343,17 +401,12 @@ namespace Granite
             const float zL = GUtil::GInterpolate(v0->z, v1->z, zTracker);
             const float zR = GUtil::GInterpolate(v1->z, v2->z, zTracker);
 
-           /* const float tL = GUtil::GInterpolate(tx0->y, tx2->y, texelStepL);
-            const float tR = GUtil::GInterpolate(tx1->y, tx2->y, texelStepR);*/
-
             _Scanline(y, px0, px1, zL, zR, tL, tR, color, texture);
 
             zTracker += depthStep;
 
             tL += texelStepL;
             tR += texelStepR;
-            /*texTrackerL += texelStepL;
-            texTrackerR += texelStepR;*/
         }
     }
 
@@ -369,9 +422,6 @@ namespace Granite
         float slope1 = (v2->x - v0->x) / (v2->y - v0->y);
 
         const float stepZ = 1.f / (v1->y - v0->y);
-
-      /*  const float stepTexelL = (tx1->y - tx0->y) / (v1->y - v0->y);
-        const float stepTexelR = (tx2->y - tx0->y) / (v2->y - v0->y);*/
 
         TextureCoordinates tTL(tx0->x, tx0->y);
         TextureCoordinates tTR(tx0->x, tx0->y);
@@ -436,7 +486,9 @@ namespace Granite
                     int texelPositionX = GUtil::Min((int)(firstTexel.u * texture->textureData->w), texture->textureData->w - 1);
                     int texelPositionY = GUtil::Min((int)(firstTexel.v * texture->textureData->h), texture->textureData->h - 1);
                     int texelPosition = (texelPositionY * texture->textureData->w) + texelPositionX;
-                    color = GetPixel(texture->textureData, texelPositionX, texelPositionY);
+                    Uint32 pixelData = GetPixel(texture->textureData, texelPositionX, texelPositionY);
+                    Pixel pixel((Uint8)(pixelData), (Uint8)(pixelData >> 8), (Uint8)(pixelData >> 16));
+                    color = _GetConvertedColor(pixel);
                     firstTexel += stepTexel;
                 }
                 depthBuffer[row * GConfig::WINDOW_WIDTH + x] = z;

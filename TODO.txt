@@ -1,6 +1,5 @@
 ﻿- Sve u utilu bi trbealo biti template
 - Samo napravi klase za matematicke tipove
-- Load freakin quads I guess!
 - Staviti sva math sranja u klase, fuck it!
 - Napravi input manager 
 - Napravi nekakav time manager

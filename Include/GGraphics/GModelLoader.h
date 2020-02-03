@@ -95,10 +95,6 @@ namespace Granite
 			std::string value;
 			lineData >> data;
 
-			/*GMath::FVector3 vertexIndices[4];
-			GMath::FVector3 textureIndices[4];
-			GMath::FVector3 normalIndices[4];*/
-
 			std::vector<GMath::FVector3> vertexIndices;
 			std::vector<GMath::FVector3> textureIndices;
 			std::vector<GMath::FVector3> normalIndices;
@@ -116,15 +112,12 @@ namespace Granite
 						{
 							case 0:
 								vertexIndices.push_back(vertices.at(std::stoi(value) - 1));
-								//vertexIndices[dataCountIndex].SetData(vertices.at(std::stoi(value) - 1));
 								break;
 							case 1:
 								textureIndices.push_back(textureCoords.at(std::stoi(value) - 1));
-								//textureIndices[dataCountIndex].SetData(textureCoords.at(std::stoi(value) - 1));
 								break;
 							case 2:
 								normalIndices.push_back(normals.at(std::stoi(value) - 1));
-								//normalIndices[dataCountIndex].SetData(normals.at(std::stoi(value) - 1));
 								break;
 						}
 					}

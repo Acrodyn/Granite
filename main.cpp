@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 
     mesh = Granite::ModelLoader::Load();
     Granite::GTexture tex("JessTex.png");
+    Granite::GGraphics::InvertSurfaceVertically(tex.textureData);
 
     bool rotateX, rotateY, rotateZ;
 
@@ -134,7 +135,7 @@ int main(int argc, char* argv[])
 
             triTranslated = polygon;
 
-            Granite::GMath::OffsetPolygonDepth(triTranslated, 1800.f);
+            Granite::GMath::OffsetPolygonDepth(triTranslated, 1900.f);
 
             Granite::GMath::FVector3 normal, line1, line2, cameraToPoint;
 
@@ -180,10 +181,8 @@ int main(int argc, char* argv[])
                     Granite::GGraphics::Pixel newColor(128, 128, 128);
                     float intensity = Granite::GUtil::Abs(dotProduct);
                     newColor.SetIntensity(intensity);
-                    //Granite::GGraphics::GetPixel(tex.textureData, 1000, 100000);
-                     Granite::GGraphics::RasterizeTriangle(triTranslated, &tex);
+                    Granite::GGraphics::RasterizeTriangle(triTranslated, &tex);
                      //Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
-                    //Granite::GGraphics::RasterizeTriangle(triTranslated, Granite::GGraphics::GetRandomColor());
                 }
             }
         }
