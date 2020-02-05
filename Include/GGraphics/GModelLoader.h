@@ -7,6 +7,8 @@
 #include <sstream>
 #include <vector>
 #include "GMath/GMath.h"
+#include "GMath/Mesh.h"
+#include "GMath/FVector3.h"
 
 namespace Granite
 {

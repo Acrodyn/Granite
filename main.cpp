@@ -5,6 +5,13 @@
 #include "GGraphics/GModelLoader.h"
 #include "GGraphics/GGraphics.h"
 #include "GGraphics/GTexture.h"
+#include "GMath/Mesh.h"
+#include "GMath/IPoint.h"
+#include "GMath/FMatrix4x4.h"
+#include "GMath/FVector3.h"
+#include "GMath/Polygon.h"
+#include "GGraphics/Colors.h"
+#include <thread>
 
 int main(int argc, char* argv[])
 {
@@ -77,11 +84,11 @@ int main(int argc, char* argv[])
             break;
         }
 
-        Granite::GGraphics::ClearScreen(Granite::GGraphics::Color::Black);
+        Granite::GGraphics::ClearScreen(Granite::Color::Black);
         Granite::GGraphics::ClearDepthBuffer();
 
         // Set up rotation matrices
-        Granite::GMath::FMatrix4x4 matRotZ, matRotX, matRotY;
+        Granite::GMath::FMatrix4x4 transformMatrix, matRotZ, matRotX, matRotY;
         fTheta += deltaTime;
 
         float xSpeed = 3.5f;
@@ -90,101 +97,47 @@ int main(int argc, char* argv[])
 
         // dodaj rotacije u funkcije or something
         // Rotation Z
-        matRotZ.matrix[0][0] = cosf(deltaTime * zSpeed);
-        matRotZ.matrix[0][1] = sinf(deltaTime * zSpeed);
-        matRotZ.matrix[1][0] = -sinf(deltaTime * zSpeed);
-        matRotZ.matrix[1][1] = cosf(deltaTime * zSpeed);
-        matRotZ.matrix[2][2] = 1;
-        matRotZ.matrix[3][3] = 1;
+        matRotZ.data[0][0] = cosf(deltaTime * zSpeed);
+        matRotZ.data[0][1] = sinf(deltaTime * zSpeed);
+        matRotZ.data[1][0] = -sinf(deltaTime * zSpeed);
+        matRotZ.data[1][1] = cosf(deltaTime * zSpeed);
+        matRotZ.data[2][2] = 1;
+        matRotZ.data[3][3] = 1;
 
         // Rotation Y
-        matRotY.matrix[0][0] = cos(deltaTime * ySpeed);
-        matRotY.matrix[0][2] = sinf(deltaTime * ySpeed);
-        matRotY.matrix[1][1] = 1;
-        matRotY.matrix[2][0] = -sinf(deltaTime * ySpeed);
-        matRotY.matrix[2][2] = cosf(deltaTime * ySpeed);
-        matRotY.matrix[3][3] = 1;
-
+        matRotY.data[0][0] = cos(deltaTime * ySpeed);
+        matRotY.data[0][2] = sinf(deltaTime * ySpeed);
+        matRotY.data[1][1] = 1;
+        matRotY.data[2][0] = -sinf(deltaTime * ySpeed);
+        matRotY.data[2][2] = cosf(deltaTime * ySpeed);
+        matRotY.data[3][3] = 1;
 
         // Rotation X
-        matRotX.matrix[0][0] = 1;
-        matRotX.matrix[1][1] = cosf(deltaTime * xSpeed);
-        matRotX.matrix[1][2] = sinf(deltaTime * xSpeed);
-        matRotX.matrix[2][1] = -sinf(deltaTime * xSpeed);
-        matRotX.matrix[2][2] = cosf(deltaTime * xSpeed);
-        matRotX.matrix[3][3] = 1;
+        matRotX.data[0][0] = 1;
+        matRotX.data[1][1] = cosf(deltaTime * xSpeed);
+        matRotX.data[1][2] = sinf(deltaTime * xSpeed);
+        matRotX.data[2][1] = -sinf(deltaTime * xSpeed);
+        matRotX.data[2][2] = cosf(deltaTime * xSpeed);
+        matRotX.data[3][3] = 1;
+
+        if (rotateZ)
+        {
+            transformMatrix = transformMatrix * matRotZ;
+        }
+
+        if (rotateX)
+        {
+            transformMatrix = transformMatrix * matRotX;
+        }
+
+        if (rotateY)
+        {
+            transformMatrix = transformMatrix * matRotY;
+        }
 
         for (auto &polygon : mesh.polygons)
         {
-            Granite::GMath::Polygon triTranslated;
-
-            if (rotateZ)
-            {
-                Granite::GMath::MultiplyMatrixPolygon(polygon, matRotZ);
-            }
-
-            if (rotateX)
-            {
-                Granite::GMath::MultiplyMatrixPolygon(polygon, matRotX);
-            }
-
-            if (rotateY)
-            {
-                Granite::GMath::MultiplyMatrixPolygon(polygon, matRotY);
-            }
-
-            triTranslated = polygon;
-
-            Granite::GMath::OffsetPolygonDepth(triTranslated, 1900.f);
-
-            Granite::GMath::FVector3 normal, line1, line2, cameraToPoint;
-
-            line1 = triTranslated.vertices[1] - triTranslated.vertices[0];
-            line2 = triTranslated.vertices[2] - triTranslated.vertices[0];
-
-            normal = line1.CrossProduct(line2);
-            normal.Normalize();
-
-            cameraToPoint = triTranslated.vertices[0] - camera;
-            cameraToPoint.Normalize();
-
-            float dotProduct = normal.DotProduct(cameraToPoint);
-
-            if (dotProduct < .0f)
-            {
-                // Project triangles from 3D --> 2D
-                Granite::GMath::MultiplyMatrixPolygon(triTranslated, projMatrix);
-
-                triTranslated.UniformMove(1.0f);
-                triTranslated.UniformScale(0.5f * (float)Granite::GConfig::WINDOW_WIDTH);
-
-                if (Granite::GConfig::WIREFRAME_MODE)
-                {
-                    Granite::GGraphics::DrawLine(
-                        Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                        Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                        Granite::GGraphics::Color::Red);
-
-                    Granite::GGraphics::DrawLine(
-                        Granite::GMath::IPoint(triTranslated.vertices[1].x, triTranslated.vertices[1].y),
-                        Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                        Granite::GGraphics::Color::Red);
-
-                    Granite::GGraphics::DrawLine(
-                        Granite::GMath::IPoint(triTranslated.vertices[2].x, triTranslated.vertices[2].y),
-                        Granite::GMath::IPoint(triTranslated.vertices[0].x, triTranslated.vertices[0].y),
-                        Granite::GGraphics::Color::Red);
-                }
-
-                if (Granite::GConfig::RASTERIZE)
-                {
-                    Granite::GGraphics::Pixel newColor(128, 128, 128);
-                    float intensity = Granite::GUtil::Abs(dotProduct);
-                    newColor.SetIntensity(intensity);
-                    Granite::GGraphics::RasterizeTriangle(triTranslated, &tex);
-                     //Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
-                }
-            }
+            polygon.RasterizePolygon(transformMatrix, &tex);
         }
 
         Granite::GGraphics::UpdateScreen();

@@ -1,5 +1,7 @@
 #include "GGraphics/GGraphics.h"
 #include "GUtils/GUtil.h"
+#include "GMath/Polygon.h"
+#include "GMath/IPoint.h"
 #include "SDL_image.h"
 
 #define SDL_LOCKIFMUST(s) (SDL_MUSTLOCK(s) ? SDL_LockSurface(s) : 0)
@@ -106,12 +108,12 @@ namespace Granite
         float fAspectRatio = (float)GConfig::WINDOW_HEIGHT / (float)GConfig::WINDOW_WIDTH;
         float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
 
-        projectionMatrix.matrix[0][0] = fAspectRatio * fFovRad;
-        projectionMatrix.matrix[1][1] = fFovRad;
-        projectionMatrix.matrix[2][2] = fFar / (fFar - fNear);
-        projectionMatrix.matrix[3][2] = (-fFar * fNear) / (fFar - fNear);
-        projectionMatrix.matrix[2][3] = 1.0f;
-        projectionMatrix.matrix[3][3] = 0.0f;
+        projectionMatrix.data[0][0] = fAspectRatio * fFovRad;
+        projectionMatrix.data[1][1] = fFovRad;
+        projectionMatrix.data[2][2] = fFar / (fFar - fNear);
+        projectionMatrix.data[3][2] = (-fFar * fNear) / (fFar - fNear);
+        projectionMatrix.data[2][3] = 1.0f;
+        projectionMatrix.data[3][3] = 0.0f;
 
         return projectionMatrix;
     }

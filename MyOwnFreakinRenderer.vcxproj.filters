@@ -31,6 +31,9 @@
     <Filter Include="Source Files\GUtils">
       <UniqueIdentifier>{f5b7da15-f576-41b2-adbe-b24faa385c51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GThread">
+      <UniqueIdentifier>{e32676ef-d7cd-4089-9663-2db2ed7f37f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -47,6 +50,12 @@
     </ClCompile>
     <ClCompile Include="Src\GUtils\GUtil.cpp">
       <Filter>Source Files\GUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GMath\FMatrix4x4.cpp">
+      <Filter>Source Files\GMath</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GMath\Mesh.cpp">
+      <Filter>Source Files\GMath</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +94,15 @@
     </ClInclude>
     <ClInclude Include="Include\GMath\Triangle.h">
       <Filter>Header Files\GMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GThread\ThreadManager.h">
+      <Filter>Header Files\GThread</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GThread\GThread.h">
+      <Filter>Header Files\GThread</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GGraphics\Colors.h">
+      <Filter>Header Files\GGraphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

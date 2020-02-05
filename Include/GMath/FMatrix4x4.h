@@ -4,9 +4,15 @@ namespace Granite
 {
 	namespace GMath
 	{
-        struct FMatrix4x4
+        class FMatrix4x4
         {
-            float matrix[4][4] = { 0 };
+        public:
+            FMatrix4x4();
+            ~FMatrix4x4();
+
+            float data[4][4] = { 0 };
+
+            FMatrix4x4 operator*(const FMatrix4x4& other);
 
             /* float &operator ()(int row, int column) const
              {

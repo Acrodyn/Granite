@@ -155,11 +155,14 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Src\GGraphics\GGraphics.cpp" />
+    <ClCompile Include="Src\GMath\FMatrix4x4.cpp" />
     <ClCompile Include="Src\GMath\GMath.cpp" />
+    <ClCompile Include="Src\GMath\Mesh.cpp" />
     <ClCompile Include="Src\GMath\Polygon.cpp" />
     <ClCompile Include="Src\GUtils\GUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\GGraphics\Colors.h" />
     <ClInclude Include="Include\GGraphics\GGraphics.h" />
     <ClInclude Include="Include\GGraphics\GModelLoader.h" />
     <ClInclude Include="Include\GGraphics\GTexture.h" />
@@ -170,6 +173,8 @@
     <ClInclude Include="Include\GMath\Mesh.h" />
     <ClInclude Include="Include\GMath\Polygon.h" />
     <ClInclude Include="Include\GMath\Triangle.h" />
+    <ClInclude Include="Include\GThread\GThread.h" />
+    <ClInclude Include="Include\GThread\ThreadManager.h" />
     <ClInclude Include="Include\GUtils\GConfig.h" />
     <ClInclude Include="Include\GUtils\GUtil.h" />
   </ItemGroup>

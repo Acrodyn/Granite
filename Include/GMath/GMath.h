@@ -1,16 +1,14 @@
 #pragma once
 
-#include "FVector3.h"
-#include "Mesh.h"
-#include "FVector3.h"
-#include "FMatrix4x4.h"
-#include "IPoint.h"
-#include "Polygon.h"
-
 namespace Granite
 {
     namespace GMath
     {
+        class FVector3;
+        class FMatrix4x4;
+        class Polygon;
+
+
         FVector3 MultiplyMatrixVector(const FVector3& vector, const FMatrix4x4& matrix);
 
         void MultiplyMatrixPolygon(Polygon& polygon, const FMatrix4x4& matrix);
