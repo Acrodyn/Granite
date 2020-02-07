@@ -291,7 +291,7 @@ namespace Granite
         _RasterizeTriangle(polygon, (Uint32)color);
     }
 
-    void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, GTexture* texture)
+    void GGraphics::RasterizeTriangle(const GMath::Polygon& polygon, const GTexture* texture)
     {
         _RasterizeTriangle(polygon, (Uint32)Color::Grey, texture);
     }
@@ -301,7 +301,7 @@ namespace Granite
         _RasterizeTriangle(polygon, color);
     }
 
-    void GGraphics::_RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color, GTexture* texture)
+    void GGraphics::_RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color, const GTexture* texture)
     {
         const GMath::FVector3 *pv0 = &polygon.vertices[0];
         const GMath::FVector3* pv1 = &polygon.vertices[1];
@@ -368,7 +368,7 @@ namespace Granite
         } 
     }
 
-    void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture)
+    void GGraphics::_RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, const GTexture* texture)
     {
         // top rule
         int yStartCeil = (int)ceil(v0->y - .5f);
@@ -412,7 +412,7 @@ namespace Granite
         }
     }
 
-    void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture)
+    void GGraphics::_RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, const GTexture* texture)
     {
         // top rule
         int yStartCeil = (int)ceil(v0->y - .5f);
@@ -461,7 +461,7 @@ namespace Granite
         }
     }
 
-    void GGraphics::_Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, TextureCoordinates firstTexel, TextureCoordinates lastTexel, Uint32 color, GTexture* texture)
+    void GGraphics::_Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, TextureCoordinates firstTexel, TextureCoordinates lastTexel, Uint32 color, const GTexture* texture)
     {
         int xStartCeil = (int)ceil(firstPixel - .5f);
         int xEndCeil = (int)ceil(lastPixel - .5f);

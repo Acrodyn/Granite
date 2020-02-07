@@ -130,7 +130,7 @@ namespace Granite
         static void RasterizeTriangle(const GMath::Polygon& polygon, Pixel color);
         static void RasterizeTriangle(const GMath::Polygon& polygon, Color color);
         static void RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color);
-        static void RasterizeTriangle(const GMath::Polygon& polygon, GTexture* texture = nullptr);
+        static void RasterizeTriangle(const GMath::Polygon& polygon, const GTexture* texture = nullptr);
 
         static enum Color GetRandomColor()
         {
@@ -149,10 +149,10 @@ namespace Granite
         static SDL_Window* window;
         static float* depthBuffer;
 
-        static void _RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color = 0, GTexture* texture = nullptr);
-        static void _RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture = nullptr);
-        static void _RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, GTexture* texture = nullptr);
-        static void _Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, TextureCoordinates firstTexel, TextureCoordinates lastTexel, Uint32 color, GTexture* texture = nullptr);
+        static void _RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color = 0, const GTexture* texture = nullptr);
+        static void _RasterizeFlatTopTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, const GTexture* texture = nullptr);
+        static void _RasterizeFlatBottomTriangle(const GMath::FVector3* v0, const GMath::FVector3* v1, const GMath::FVector3* v2, const GMath::FVector3* tx0, const GMath::FVector3* tx1, const GMath::FVector3* tx2, Uint32 color, const GTexture* texture = nullptr);
+        static void _Scanline(int row, float firstPixel, float lastPixel, float firstPixelZ, float lastPixelZ, TextureCoordinates firstTexel, TextureCoordinates lastTexel, Uint32 color, const GTexture* texture = nullptr);
        
         static Uint32 _GetConvertedColor(Color color)
         {

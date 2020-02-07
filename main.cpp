@@ -11,7 +11,7 @@
 #include "GMath/FVector3.h"
 #include "GMath/Polygon.h"
 #include "GGraphics/Colors.h"
-#include <thread>
+#include "GThread/ThreadManager.h"
 
 int main(int argc, char* argv[])
 {
@@ -37,6 +37,10 @@ int main(int argc, char* argv[])
 
     bool rotateX, rotateY, rotateZ;
 
+    float xSpeed = 5.5f;
+    float ySpeed = 5.3f;
+    float zSpeed = 5.4f;
+
     while (true)
     {
         rotateX = false;
@@ -48,10 +52,10 @@ int main(int argc, char* argv[])
         deltaTime = milisecondsPassed / 1000.f;
         startTime = endTime;
 
-        if (milisecondsPassed < milisecondsPerFrame)
+       /* if (milisecondsPassed < milisecondsPerFrame)
         {
             SDL_Delay(milisecondsPerFrame - milisecondsPassed);
-        }
+        }*/
 
         if (milisecondsPassed > milisecondsPerFrame) {
             printf("FPS is: %f \n", 1000.f / milisecondsPassed);
@@ -90,10 +94,6 @@ int main(int argc, char* argv[])
         // Set up rotation matrices
         Granite::GMath::FMatrix4x4 transformMatrix, matRotZ, matRotX, matRotY;
         fTheta += deltaTime;
-
-        float xSpeed = 3.5f;
-        float ySpeed = 3.3f;
-        float zSpeed = 3.4f;
 
         // dodaj rotacije u funkcije or something
         // Rotation Z
@@ -135,11 +135,7 @@ int main(int argc, char* argv[])
             transformMatrix = transformMatrix * matRotY;
         }
 
-        for (auto &polygon : mesh.polygons)
-        {
-            polygon.RasterizePolygon(transformMatrix, &tex);
-        }
-
+        mesh.RasterizePolygons(transformMatrix, tex);
         Granite::GGraphics::UpdateScreen();
     }
 

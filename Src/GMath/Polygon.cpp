@@ -41,22 +41,22 @@ namespace Granite
             vertices[2].z *= scalar;
         }
 
-        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, Color color)
+        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, Color color) const
         {
             RasterizePolygon(transformMatrix, color, nullptr);
         }
 
-        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, GTexture* texture)
+        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, const GTexture* texture) const
         {
             RasterizePolygon(transformMatrix, Color::Grey, texture);
         }
 
-        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, Color color, GTexture* texture)
+        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, Color color, const GTexture* texture) const
         {
             FVector3 camera; // TEMP!
             Polygon triTranslated;
 
-            MultiplyMatrixPolygon(*this, transformMatrix);
+            MultiplyMatrixPolygon(const_cast<Polygon&>(*this), transformMatrix);
             triTranslated = *this;
             OffsetPolygonDepth(triTranslated, 1900.f);
 
