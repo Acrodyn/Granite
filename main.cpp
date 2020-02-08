@@ -27,13 +27,9 @@ int main(int argc, char* argv[])
     float fps = 0;
 
     float fTheta = .0f;
-    Granite::GMath::Mesh mesh;
+    Granite::GMath::Mesh mesh("Jess.obj", "JessTex.png");
     Granite::GMath::FMatrix4x4 projMatrix = Granite::GGraphics::GetProjectionMatrix();
     Granite::GMath::FVector3 camera;
-
-    mesh = Granite::ModelLoader::Load();
-    Granite::GTexture tex("JessTex.png");
-    Granite::GGraphics::InvertSurfaceVertically(tex.textureData);
 
     bool rotateX, rotateY, rotateZ;
 
@@ -135,7 +131,7 @@ int main(int argc, char* argv[])
             transformMatrix = transformMatrix * matRotY;
         }
 
-        mesh.RasterizePolygons(transformMatrix, tex);
+        mesh.RasterizePolygons(transformMatrix);
         Granite::GGraphics::UpdateScreen();
     }
 

@@ -15,11 +15,9 @@ namespace Granite
 	class ModelLoader 
 	{
 	public:
-		static GMath::Mesh Load()
+		static void LoadModel(GMath::Mesh& mesh, std::string modelPath)
 		{
-			std::ifstream file("Jess.obj");
-
-			GMath::Mesh mesh;
+			std::ifstream file(modelPath);
 
 			std::vector<GMath::FVector3> vertices = {};
 			std::vector<GMath::FVector3> textureCoords = {};
@@ -72,8 +70,6 @@ namespace Granite
 					}
 				}
 			}
-
-			return mesh;
 		}
 	private:
 
@@ -156,7 +152,7 @@ namespace Granite
 				textureIndicesArr[0] = textureIndices[0];
 				normalIndicesArr[0] = normalIndices[0];
 
-				mesh.AddPolygon(vertexIndicesArr, textureIndicesArr, normalIndicesArr);
+				mesh._AddPolygon(vertexIndicesArr, textureIndicesArr, normalIndicesArr);
 
 				--dataCountIndex;;
 			}
@@ -202,7 +198,7 @@ namespace Granite
 
 				vertexIndicesArr[0] = vertexIndices[0];
 
-				mesh.AddPolygon(vertexIndicesArr);
+				mesh._AddPolygon(vertexIndicesArr);
 
 				--dataCountIndex;;
 			}

@@ -10,13 +10,17 @@ namespace Granite
 	class GTexture
 	{
 	public:
-		GTexture() = delete;
+		GTexture() = default;
 		GTexture(const char* file)
+		{
+			LoadTexture(file);
+		}
+		~GTexture() = default;
+
+		void LoadTexture(const char* file)
 		{
 			textureData = IMG_Load(file);
 		}
-
-		~GTexture() = default;
 
 		SDL_Surface* textureData;
 	private:

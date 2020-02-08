@@ -1,10 +1,12 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 namespace Granite
 {
     class GTexture;
+    class ModelLoader;
 
 	namespace GMath
 	{
@@ -15,15 +17,21 @@ namespace Granite
         class Mesh
         {
         public:
-            std::vector<Polygon> polygons;
+            Mesh() = default;
+            Mesh(std::string modelPath, std::string texturePath = "");
+            ~Mesh();
 
-            void AddPolygon(const FVector3* vertices);
-            void AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals);
-            void RasterizePolygons(const Granite::GMath::FMatrix4x4& transformMatrix, const Granite::GTexture& tex);
+            void RasterizePolygons(const Granite::GMath::FMatrix4x4& transformMatrix);
 
         private:
-            //const Granite::GMath::FMatrix4x4 & transformMatrix, const Granite::GTexture& tex
-            void _RasterizePolygonThread(int startingPolygonIndex, int endingPolygonIndex, const Granite::GMath::FMatrix4x4& transformMatrix, const Granite::GTexture& tex);
+            void _AddPolygon(const FVector3* vertices);
+            void _AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals);
+            void _RasterizePolygonThread(int startingPolygonIndex, int endingPolygonIndex, const Granite::GMath::FMatrix4x4& transformMatrix);
+
+            std::vector<Polygon> polygons;
+            GTexture *meshTexture;
+
+            friend ModelLoader;
         };
 	}
 }

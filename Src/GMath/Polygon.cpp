@@ -58,7 +58,7 @@ namespace Granite
 
             MultiplyMatrixPolygon(const_cast<Polygon&>(*this), transformMatrix);
             triTranslated = *this;
-            OffsetPolygonDepth(triTranslated, 1900.f);
+            OffsetPolygonDepth(triTranslated, 1800.f);
 
             FVector3 normal, line1, line2, cameraToPoint;
 

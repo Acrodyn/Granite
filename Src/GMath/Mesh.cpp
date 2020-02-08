@@ -10,7 +10,27 @@ namespace Granite
 {
     namespace GMath
     {
-        void Mesh::AddPolygon(const FVector3* vertices)
+        Mesh::Mesh(std::string modelPath, std::string texturePath)
+        {
+            ModelLoader::LoadModel(*this, modelPath);
+
+            if (texturePath != "")
+            {
+                meshTexture = new GTexture(texturePath.c_str());
+                Granite::GGraphics::InvertSurfaceVertically(meshTexture->textureData);
+            }
+        }
+
+        Mesh::~Mesh()
+        {
+            if (!meshTexture)
+            {
+                delete meshTexture;
+                meshTexture = nullptr;
+            }
+        }
+
+        void Mesh::_AddPolygon(const FVector3* vertices)
         {
             Polygon newPolygon;
 
@@ -22,7 +42,7 @@ namespace Granite
             polygons.push_back(newPolygon);
         }
 
-        void Mesh::AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals)
+        void Mesh::_AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals)
         {
             Polygon newPolygon;
 
@@ -37,7 +57,7 @@ namespace Granite
         }
 
 
-        void Mesh::RasterizePolygons(const Granite::GMath::FMatrix4x4& transformMatrix, const Granite::GTexture& tex)
+        void Mesh::RasterizePolygons(const Granite::GMath::FMatrix4x4& transformMatrix)
         {
             const int threadNumber = 8;
             int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
@@ -45,7 +65,7 @@ namespace Granite
 
             for (int i = 0; i < threadNumber; ++i)
             {
-                threads[i] = std::thread(&Mesh::_RasterizePolygonThread, this, segmentSize * i, segmentSize * (i + 1) , transformMatrix, tex);
+                threads[i] = std::thread(&Mesh::_RasterizePolygonThread, this, segmentSize * i, segmentSize * (i + 1) , transformMatrix);
             }
 
             for (int i = 0; i < threadNumber; ++i)
@@ -54,7 +74,7 @@ namespace Granite
             }
         }
 
-        void Mesh::_RasterizePolygonThread(int startingPolygonIndex, int endingPolygonIndex, const Granite::GMath::FMatrix4x4& transformMatrix, const Granite::GTexture& tex)
+        void Mesh::_RasterizePolygonThread(int startingPolygonIndex, int endingPolygonIndex, const Granite::GMath::FMatrix4x4& transformMatrix)
         {
             if (endingPolygonIndex > polygons.size())
             {
@@ -63,7 +83,7 @@ namespace Granite
 
             for (int i = startingPolygonIndex; i < endingPolygonIndex; ++i)
             {
-                polygons[i].RasterizePolygon(transformMatrix, &tex);
+                polygons[i].RasterizePolygon(transformMatrix, &(*meshTexture));
             }
         }
     }
