@@ -1,4 +1,4 @@
-#include "GMath/GMath.h"
+﻿#include "GMath/GMath.h"
 #include "GMath/FVector3.h"
 #include "GMath/FMatrix4x4.h"
 #include "GMath/Polygon.h"
@@ -7,6 +7,8 @@ namespace Granite
 {
 	namespace GMath
 	{
+        // TODO: Ovo SVE treba ici u matrix classu i treba pretty much izbrisat cijeli GMath file
+
         FVector3 MultiplyMatrixVector(const FVector3& vector, const FMatrix4x4& matrix)
         {
             FVector3 multipliedVector;

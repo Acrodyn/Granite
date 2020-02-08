@@ -10,6 +10,18 @@ namespace Granite
 {
     namespace GMath
     {
+        void Mesh::AddPolygon(const FVector3* vertices)
+        {
+            Polygon newPolygon;
+
+            for (int i = 0; i < 3; ++i)
+            {
+                newPolygon.vertices[i] = vertices[i];
+            }
+
+            polygons.push_back(newPolygon);
+        }
+
         void Mesh::AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals)
         {
             Polygon newPolygon;

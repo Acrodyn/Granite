@@ -101,10 +101,10 @@ namespace Granite
 
                 if (GConfig::RASTERIZE)
                 {
-                   /* GGraphics::Pixel newColor(128, 128, 128);
+                    /*GGraphics::Pixel newColor(128, 128, 128);
                     float intensity = GUtil::Abs(dotProduct);
-                    newColor.SetIntensity(intensity);*/
-                    //Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
+                    newColor.SetIntensity(intensity);
+                    Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);*/
 
                     if (texture != nullptr)
                     {

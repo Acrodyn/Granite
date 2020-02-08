@@ -17,6 +17,7 @@ namespace Granite
         public:
             std::vector<Polygon> polygons;
 
+            void AddPolygon(const FVector3* vertices);
             void AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals);
             void RasterizePolygons(const Granite::GMath::FMatrix4x4& transformMatrix, const Granite::GTexture& tex);
 

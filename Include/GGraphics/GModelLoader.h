@@ -56,7 +56,14 @@ namespace Granite
 					// polygonal face element
 					else if (dataType == "f")
 					{
-						_LoadPoly(line, vertices, textureCoords, normals, mesh);
+						if (line.find('/') != std::string::npos)
+						{
+							_LoadPoly(line, vertices, textureCoords, normals, mesh);
+						}
+						else
+						{
+							_LoadPoly(line, vertices, mesh);
+						}
 					}
 					// line element
 					else if (dataType == "l")
@@ -150,6 +157,52 @@ namespace Granite
 				normalIndicesArr[0] = normalIndices[0];
 
 				mesh.AddPolygon(vertexIndicesArr, textureIndicesArr, normalIndicesArr);
+
+				--dataCountIndex;;
+			}
+		}
+
+		// only vertices
+		static void _LoadPoly(std::string line, const std::vector<GMath::FVector3>& vertices, GMath::Mesh& mesh)
+		{
+			int dataCountIndex = 0;
+			std::stringstream lineData(line);
+			std::string data;
+			std::string value;
+			lineData >> data;
+
+			std::vector<GMath::FVector3> vertexIndices;
+
+			while (lineData >> data)
+			{
+				std::stringstream sData(data);
+
+				while (getline(sData, value))
+				{
+					if (value != "")
+					{
+						vertexIndices.push_back(vertices.at(std::stoi(value) - 1));
+					}
+				}
+				++dataCountIndex;
+			}
+
+			// triangulate
+			while (dataCountIndex >= 3)
+			{
+				GMath::FVector3 vertexIndicesArr[3];
+
+				int triangleFirst = dataCountIndex - 3;
+				int triangleLast = dataCountIndex - 1;
+
+				for (int vi = dataCountIndex - 1, ai = 2; ai > 0; --vi, --ai)
+				{
+					vertexIndicesArr[ai] = vertexIndices[vi];
+				}
+
+				vertexIndicesArr[0] = vertexIndices[0];
+
+				mesh.AddPolygon(vertexIndicesArr);
 
 				--dataCountIndex;;
 			}

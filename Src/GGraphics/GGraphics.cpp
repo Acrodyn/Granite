@@ -44,7 +44,7 @@ namespace Granite
         SDL_UpdateWindowSurface(window);
     }
 
-    // rewrite this or find the alternative
+    // TODO: rewrite this or find the alternative
     int GGraphics::InvertSurfaceVertically(SDL_Surface* surface)
     {
         Uint8* t;
@@ -98,6 +98,7 @@ namespace Granite
         return 0;
     }
 
+    // TODO: Ovo treba primat parametre i po tome podešavat projection matrix, bez hardkodiranja!
     GMath::FMatrix4x4 GGraphics::GetProjectionMatrix()
     {
         GMath::FMatrix4x4 projectionMatrix;
