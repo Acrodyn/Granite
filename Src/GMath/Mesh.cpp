@@ -10,7 +10,7 @@ namespace Granite
 {
     namespace GMath
     {
-        Mesh::Mesh(std::string modelPath, std::string texturePath)
+        Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr)
         {
             ModelLoader::LoadModel(*this, modelPath);
 
@@ -27,6 +27,75 @@ namespace Granite
             {
                 delete meshTexture;
                 meshTexture = nullptr;
+            }
+        }
+
+
+        void Mesh::RasterizePolygons()
+        {
+            const int threadNumber = 8;
+            int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
+            std::thread threads[threadNumber];
+
+            for (int i = 0; i < threadNumber; ++i)
+            {
+                threads[i] = std::thread(&Mesh::_RasterizePolygonThread, this, segmentSize * i, segmentSize * (i + 1));
+            }
+
+            for (int i = 0; i < threadNumber; ++i)
+            {
+                threads[i].join();
+            }
+        }
+
+        void Mesh::TransformPolygons(const Granite::GMath::FMatrix4x4& transformMatrix)
+        {
+            const int threadNumber = 8;
+            int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
+            std::thread threads[threadNumber];
+
+            for (int i = 0; i < threadNumber; ++i)
+            {
+                threads[i] = std::thread(&Mesh::_TransformPolygonThread, this, segmentSize * i, segmentSize * (i + 1), transformMatrix);
+            }
+
+            for (int i = 0; i < threadNumber; ++i)
+            {
+                threads[i].join();
+            }
+        }
+
+        void Mesh::OffsetMesh(float offset)
+        {
+            for (auto& poly : polygons)
+            {
+                GMath::OffsetPolygonDepth(poly, offset);
+            }
+        }
+
+        void Mesh::_RasterizePolygonThread(int startingPolygonIndex, int endingPolygonIndex)
+        {
+            if (endingPolygonIndex > polygons.size())
+            {
+                endingPolygonIndex = polygons.size();
+            }
+
+            for (int i = startingPolygonIndex; i < endingPolygonIndex; ++i)
+            {
+                polygons[i].RasterizePolygon(&(*meshTexture));
+            }
+        }
+
+        void Mesh::_TransformPolygonThread(int startingPolygonIndex, int endingPolygonIndex, const Granite::GMath::FMatrix4x4& transformMatrix)
+        {
+            if (endingPolygonIndex > polygons.size())
+            {
+                endingPolygonIndex = polygons.size();
+            }
+
+            for (int i = startingPolygonIndex; i < endingPolygonIndex; ++i)
+            {
+                polygons[i].TransformPolygon(transformMatrix);
             }
         }
 
@@ -54,37 +123,6 @@ namespace Granite
             }
 
             polygons.push_back(newPolygon);
-        }
-
-
-        void Mesh::RasterizePolygons(const Granite::GMath::FMatrix4x4& transformMatrix)
-        {
-            const int threadNumber = 8;
-            int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
-            std::thread threads[threadNumber];
-
-            for (int i = 0; i < threadNumber; ++i)
-            {
-                threads[i] = std::thread(&Mesh::_RasterizePolygonThread, this, segmentSize * i, segmentSize * (i + 1) , transformMatrix);
-            }
-
-            for (int i = 0; i < threadNumber; ++i)
-            {
-                threads[i].join();
-            }
-        }
-
-        void Mesh::_RasterizePolygonThread(int startingPolygonIndex, int endingPolygonIndex, const Granite::GMath::FMatrix4x4& transformMatrix)
-        {
-            if (endingPolygonIndex > polygons.size())
-            {
-                endingPolygonIndex = polygons.size();
-            }
-
-            for (int i = startingPolygonIndex; i < endingPolygonIndex; ++i)
-            {
-                polygons[i].RasterizePolygon(transformMatrix, &(*meshTexture));
-            }
         }
     }
 }

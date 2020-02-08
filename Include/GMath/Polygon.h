@@ -21,9 +21,10 @@ namespace Granite
 
             void UniformMove(float scalar);
             void UniformScale(float scalar);
-            void RasterizePolygon(const FMatrix4x4& transformMatrix, Color color) const;
-            void RasterizePolygon(const FMatrix4x4& transformMatrix, const GTexture* texture) const;
-            void RasterizePolygon(const FMatrix4x4& transformMatrix, Color color, const GTexture* texture) const;
+            void TransformPolygon(const FMatrix4x4& transformMatrix);
+            void RasterizePolygon(Color color) const;
+            void RasterizePolygon(const GTexture* texture) const;
+            void RasterizePolygon(Color color, const GTexture* texture) const;
         };
 	}
 }

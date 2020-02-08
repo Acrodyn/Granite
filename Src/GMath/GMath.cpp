@@ -9,6 +9,48 @@ namespace Granite
 	{
         // TODO: Ovo SVE treba ici u matrix classu i treba pretty much izbrisat cijeli GMath file
 
+        FMatrix4x4 GetXRotation(float angle)
+        {
+            FMatrix4x4 rotation;
+
+            rotation.data[0][0] = 1;
+            rotation.data[1][1] = cosf(angle);
+            rotation.data[1][2] = sinf(angle);
+            rotation.data[2][1] = -sinf(angle);
+            rotation.data[2][2] = cosf(angle);
+            rotation.data[3][3] = 1;
+
+            return rotation;
+        }
+
+        FMatrix4x4 GetYRotation(float angle)
+        {
+            FMatrix4x4 rotation;
+
+            rotation.data[0][0] = cos(angle);
+            rotation.data[0][2] = sinf(angle);
+            rotation.data[1][1] = 1;
+            rotation.data[2][0] = -sinf(angle);
+            rotation.data[2][2] = cosf(angle);
+            rotation.data[3][3] = 1;
+
+            return rotation;
+        }
+
+        FMatrix4x4 GetZRotation(float angle)
+        {
+            FMatrix4x4 rotation;
+
+            rotation.data[0][0] = cosf(angle);
+            rotation.data[0][1] = sinf(angle);
+            rotation.data[1][0] = -sinf(angle);
+            rotation.data[1][1] = cosf(angle);
+            rotation.data[2][2] = 1;
+            rotation.data[3][3] = 1;
+
+            return rotation;
+        }
+
         FVector3 MultiplyMatrixVector(const FVector3& vector, const FMatrix4x4& matrix)
         {
             FVector3 multipliedVector;
@@ -53,6 +95,11 @@ namespace Granite
                 oTriangle.vertices[i].z = oTriangle.vertices[i].z + offset;
                 //oTriangle.normals[i].z = oTriangle.normals[i].z + offset;
             }
+        }
+
+        float AnglesToRadians(float angles)
+        {
+            return angles * PI / 180.f;
         }
 	}
 }

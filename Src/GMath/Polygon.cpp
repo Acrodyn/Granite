@@ -41,24 +41,26 @@ namespace Granite
             vertices[2].z *= scalar;
         }
 
-        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, Color color) const
+        void Polygon::TransformPolygon(const FMatrix4x4& transformMatrix)
         {
-            RasterizePolygon(transformMatrix, color, nullptr);
+            MultiplyMatrixPolygon(const_cast<Polygon&>(*this), transformMatrix);
         }
 
-        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, const GTexture* texture) const
+        void Polygon::RasterizePolygon(Color color) const
         {
-            RasterizePolygon(transformMatrix, Color::Grey, texture);
+            RasterizePolygon(color, nullptr);
         }
 
-        void Polygon::RasterizePolygon(const FMatrix4x4& transformMatrix, Color color, const GTexture* texture) const
+        void Polygon::RasterizePolygon(const GTexture* texture) const
+        {
+            RasterizePolygon(Color::Grey, texture);
+        }
+
+        void Polygon::RasterizePolygon(Color color, const GTexture* texture) const
         {
             FVector3 camera; // TEMP!
-            Polygon triTranslated;
-
-            MultiplyMatrixPolygon(const_cast<Polygon&>(*this), transformMatrix);
-            triTranslated = *this;
-            OffsetPolygonDepth(triTranslated, 1800.f);
+            Polygon triTranslated = *this;
+            OffsetPolygonDepth(triTranslated, 5.f);
 
             FVector3 normal, line1, line2, cameraToPoint;
 
@@ -101,19 +103,19 @@ namespace Granite
 
                 if (GConfig::RASTERIZE)
                 {
-                    /*GGraphics::Pixel newColor(128, 128, 128);
+                    GGraphics::Pixel newColor(128, 128, 128);
                     float intensity = GUtil::Abs(dotProduct);
                     newColor.SetIntensity(intensity);
-                    Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);*/
+                    Granite::GGraphics::RasterizeTriangle(triTranslated, newColor);
 
-                    if (texture != nullptr)
+                /*    if (texture != nullptr)
                     {
                         GGraphics::RasterizeTriangle(triTranslated, &(*texture));
                     }
                     else
                     {
                         GGraphics::RasterizeTriangle(triTranslated, color);
-                    }
+                    }*/
                 }
             }
         }

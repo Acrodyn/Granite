@@ -11,8 +11,15 @@ namespace Granite
 
         FVector3 MultiplyMatrixVector(const FVector3& vector, const FMatrix4x4& matrix);
 
+        FMatrix4x4 GetXRotation(float angle);
+        FMatrix4x4 GetYRotation(float angle);
+        FMatrix4x4 GetZRotation(float angle);
+
         void MultiplyMatrixPolygon(Polygon& polygon, const FMatrix4x4& matrix);
         void MultiplyMatrixPolygon(const Polygon& iPolygon, Polygon& oPolygon, const FMatrix4x4& matrix);
         void OffsetPolygonDepth(Polygon& oTriangle, float offset);
+        float AnglesToRadians(float angles);
+
+        const float PI = 3.14159265359f;
     }
 }

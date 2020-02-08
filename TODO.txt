@@ -14,4 +14,4 @@
 - ubi sve normale iz mesha, ne trebaju nam
 - Position vertex?
 - izbriši thread manager, for now
-- MESH mora imati object loader IIIIII teksturu!!!
+- Sredi offset problem u rendereru
