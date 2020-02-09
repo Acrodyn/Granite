@@ -28,14 +28,17 @@ int main(int argc, char* argv[])
     float fps = 0;
     bool rotateX, rotateY, rotateZ;
 
-    Granite::GMath::Mesh mesh("teapot.obj");
+    float cameraSpeed = 50.f;
+
+    Granite::GMath::Mesh mesh("axis.obj");
     mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
+    mesh.Transform(Granite::GMath::GetYRotation(Granite::GMath::AnglesToRadians(180.f)));
 
     Granite::Camera camera;
     Granite::Camera::SetMainCamera(camera);
 
-    Granite::GMath::FVector3 lookDir = {0, 0, 1};
-    Granite::GMath::FVector3 vUp = { 0, 1, 0 };
+    Granite::GMath::FVector3 forwardVector = {0, 0, 1};
+    Granite::GMath::FVector3 upVector = { 0, 1, 0 };
 
     while (true)
     {
@@ -53,9 +56,7 @@ int main(int argc, char* argv[])
             SDL_Delay(milisecondsPerFrame - milisecondsPassed);
         }*/
 
-        if (milisecondsPassed > milisecondsPerFrame) {
-            printf("FPS is: %f \n", 1000.f / milisecondsPassed);
-        }
+        printf("FPS is: %f \n", 1000.f / milisecondsPassed);
 
         while (SDL_PollEvent(&e))
         {
@@ -78,22 +79,22 @@ int main(int argc, char* argv[])
 
                 if (e.key.keysym.sym == SDLK_UP)
                 {
-                    Granite::Camera::GetMainCamera()->position.y -= 20.0f * deltaTime;
+                    Granite::Camera::GetMainCamera()->position.y -= cameraSpeed * deltaTime;
                 }
 
                 if (e.key.keysym.sym == SDLK_DOWN)
                 {
-                    Granite::Camera::GetMainCamera()->position.y += 20.0f * deltaTime;
+                    Granite::Camera::GetMainCamera()->position.y += cameraSpeed * deltaTime;
                 }
 
                 if (e.key.keysym.sym == SDLK_LEFT)
                 {
-                    Granite::Camera::GetMainCamera()->position.x -= 20.0f * deltaTime;
+                    Granite::Camera::GetMainCamera()->position.x -= cameraSpeed * deltaTime;
                 }
 
                 if (e.key.keysym.sym == SDLK_RIGHT)
                 {
-                    Granite::Camera::GetMainCamera()->position.x += 20.0f * deltaTime;
+                    Granite::Camera::GetMainCamera()->position.x += cameraSpeed * deltaTime;
                 }
             }
         }
@@ -109,14 +110,13 @@ int main(int argc, char* argv[])
 
         Granite::GMath::FMatrix4x4 transformMatrix;
         transformMatrix.MakeIdentity();
-       // transformMatrix = Granite::GMath::GetTranslationMatrix(0.f, 0.f, 5.f); // ovo moze komotno bit u samoj matrici!
+       //transformMatrix = Granite::GMath::GetTranslationMatrix(0.f, 0.f, 5.f); // ovo moze komotno bit u samoj matrici!
 
         Granite::GMath::FMatrix4x4 matWorld;
         matWorld.MakeIdentity();
 
-        // Set up rotation matrices
-        Granite::GMath::FVector3 vTarget = Granite::Camera::GetMainCamera()->position + lookDir;
-        Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, vTarget, vUp);
+        Granite::GMath::FVector3 vTarget = Granite::Camera::GetMainCamera()->position + forwardVector;
+        Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, vTarget, upVector);
         Granite::GMath::FMatrix4x4 matView = Granite::GMath::GetInverseMatrix(matCamera);
 
         if (rotateX)

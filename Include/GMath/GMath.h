@@ -25,6 +25,6 @@ namespace Granite
         void OffsetPolygonDepth(Polygon& oTriangle, float offset);
         float AnglesToRadians(float angles);
 
-        const float PI = 3.14159265359f;
+        const float PI = 3.1415926535898f;
     }
 }

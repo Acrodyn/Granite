@@ -65,9 +65,9 @@ namespace Granite
         void Polygon::RasterizePolygon(Color color, const GTexture* texture) const
         {
             Polygon triTranslated = *this;
-            transformation = transformation * meshPtr->GetWorldSpaceTransform();
+            transformation = transformation * meshPtr->GetWorldSpaceTransform(); // TODO: možda mogu direkt ovo napravit?
             MultiplyMatrixPolygon(triTranslated, transformation);
-            OffsetPolygonDepth(triTranslated, 5.f);
+            OffsetPolygonDepth(triTranslated, 15.f);
 
             FVector3 normal, line1, line2, cameraToPoint;
 

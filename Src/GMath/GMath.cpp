@@ -92,18 +92,18 @@ namespace Granite
         {
             GMath::FMatrix4x4 projectionMatrix;
 
-            float fNear = 0.1f;
-            float fFar = 1000.0f;
-            float fFov = 90.0f;
-            float fAspectRatio = (float)GConfig::WINDOW_HEIGHT / (float)GConfig::WINDOW_WIDTH;
-            float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+            float near = 0.1f;
+            float far = 1000.0f;
+            float fFovRad = GMath::AnglesToRadians(90.f);
 
-            projectionMatrix.data[0][0] = fAspectRatio * fFovRad;
+            float scale = 1 / tan(90.f * 0.5 * M_PI / 180); // alternative
+
+            projectionMatrix.data[0][0] = fFovRad;
             projectionMatrix.data[1][1] = fFovRad;
-            projectionMatrix.data[2][2] = fFar / (fFar - fNear);
-            projectionMatrix.data[3][2] = (-fFar * fNear) / (fFar - fNear);
-            projectionMatrix.data[2][3] = 1.0f;
-            projectionMatrix.data[3][3] = 0.0f;
+            projectionMatrix.data[2][2] = far / (far - near);
+            projectionMatrix.data[3][2] = -far * near / (far - near);
+            projectionMatrix.data[2][3] = 1.f;
+            projectionMatrix.data[3][3] = 0.f;
 
             return projectionMatrix;
         }
