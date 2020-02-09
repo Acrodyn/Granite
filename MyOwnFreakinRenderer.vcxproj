@@ -154,6 +154,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Src\GGraphics\Camera.cpp" />
     <ClCompile Include="Src\GGraphics\GGraphics.cpp" />
     <ClCompile Include="Src\GMath\FMatrix4x4.cpp" />
     <ClCompile Include="Src\GMath\GMath.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="Src\GUtils\GUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\GGraphics\Camera.h" />
     <ClInclude Include="Include\GGraphics\Colors.h" />
     <ClInclude Include="Include\GGraphics\GGraphics.h" />
     <ClInclude Include="Include\GGraphics\GModelLoader.h" />

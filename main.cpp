@@ -5,6 +5,7 @@
 #include "GGraphics/GModelLoader.h"
 #include "GGraphics/GGraphics.h"
 #include "GGraphics/GTexture.h"
+#include "GGraphics/Camera.h"
 #include "GMath/Mesh.h"
 #include "GMath/IPoint.h"
 #include "GMath/FMatrix4x4.h"
@@ -25,13 +26,15 @@ int main(int argc, char* argv[])
     float endTime = 0;
     float milisecondsPerFrame = 16.f;
     float fps = 0;
-    bool rotateX, rotateY, rotateZ, moveUp, moveDown;
+    bool rotateX, rotateY, rotateZ;
 
     Granite::GMath::Mesh mesh("teapot.obj");
     mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
 
     // TEST
-    Granite::GMath::FVector3 camera;
+    Granite::Camera camera;
+    Granite::Camera::SetMainCamera(camera);
+
     Granite::GMath::FVector3 lookDir = {0, 0, 1};
     Granite::GMath::FVector3 vUp = { 0, 1, 0 };
     // TEST
@@ -43,8 +46,6 @@ int main(int argc, char* argv[])
         rotateX = false;
         rotateY = false;
         rotateZ = false;
-        moveUp = false;
-        moveDown = false;
 
         endTime = SDL_GetTicks();
         milisecondsPassed = endTime - startTime;
@@ -81,12 +82,12 @@ int main(int argc, char* argv[])
 
                 if (e.key.keysym.sym == SDLK_UP)
                 {
-                    moveUp = true;
+                    Granite::Camera::GetMainCamera()->position.y -= 8.0f * deltaTime;
                 }
 
                 if (e.key.keysym.sym == SDLK_DOWN)
                 {
-                    moveDown = true;
+                    Granite::Camera::GetMainCamera()->position.y += 8.0f * deltaTime;
                 }
             }
         }
@@ -101,8 +102,8 @@ int main(int argc, char* argv[])
         Granite::GGraphics::ClearDepthBuffer();
 
         // Set up rotation matrices
-        Granite::GMath::FVector3 vTarget = camera + lookDir;
-        Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(camera, vTarget, vUp);
+        Granite::GMath::FVector3 vTarget = Granite::Camera::GetMainCamera()->position + lookDir;
+        Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, vTarget, vUp);
         Granite::GMath::FMatrix4x4 matView = Granite::GMath::GetInverseMatrix(matCamera);
 
         if (rotateX)
@@ -118,16 +119,6 @@ int main(int argc, char* argv[])
         if (rotateZ)
         {
             transformMatrix = transformMatrix * Granite::GMath::GetZRotation(deltaTime * 5.4f);
-        }
-
-        if (moveUp)
-        {
-           camera.y -= 0.1;
-        }
-
-        if (moveDown)
-        {
-            camera.y += 0.1f;
         }
 
         transformMatrix = transformMatrix * matView;

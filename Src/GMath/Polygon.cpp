@@ -6,6 +6,7 @@
 #include "GUtils/GUtil.h"
 #include "GGraphics/GTexture.h"
 #include "GGraphics/Colors.h"
+#include "GGraphics/Camera.h"
 
 namespace Granite
 {
@@ -63,7 +64,6 @@ namespace Granite
 
         void Polygon::RasterizePolygon(Color color, const GTexture* texture) const
         {
-            FVector3 camera; // TEMP!
             Polygon triTranslated = *this;
             MultiplyMatrixPolygon(triTranslated, meshPtr->GetWorldTransform());
             OffsetPolygonDepth(triTranslated, 5.f);
@@ -76,7 +76,7 @@ namespace Granite
             normal = line1.CrossProduct(line2);
             normal.Normalize();
 
-            cameraToPoint = triTranslated.vertices[0] - camera;
+            cameraToPoint = triTranslated.vertices[0] - Camera::GetMainCamera()->position;
             cameraToPoint.Normalize();
 
             float dotProduct = normal.DotProduct(cameraToPoint);

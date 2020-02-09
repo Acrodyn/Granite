@@ -351,7 +351,7 @@ namespace Granite
     {
         // top rule
         int yStartCeil = (int)ceil(v0->y - .5f);
-        int yEndCeil = (int)ceil(v2->y - .5f);;
+        int yEndCeil = (int)ceil(v2->y - .5f);
         const int yStart = (yStartCeil < 0) ? 0 : yStartCeil;
         const int yEnd = (yEndCeil >= GConfig::WINDOW_HEIGHT) ? GConfig::WINDOW_HEIGHT - 1 : yEndCeil;
 

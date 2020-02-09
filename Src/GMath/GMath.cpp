@@ -56,7 +56,8 @@ namespace Granite
             FVector3 forward = target - pos;
             forward.Normalize();
 
-            FVector3 newUp = up - (forward * up.DotProduct(forward));
+            FVector3 a = forward * up.DotProduct(forward);
+            FVector3 newUp = up - a;
             newUp.Normalize();
 
             FVector3 newRight = newUp.CrossProduct(forward);
