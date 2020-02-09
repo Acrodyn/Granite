@@ -86,6 +86,27 @@ namespace Granite
             return invMatrix;
         }
 
+        // TODO: Ovo treba primat parametre i po tome podešavat projection matrix, bez hardkodiranja!
+        FMatrix4x4 GetProjectionMatrix()
+        {
+            GMath::FMatrix4x4 projectionMatrix;
+
+            float fNear = 0.1f;
+            float fFar = 1000.0f;
+            float fFov = 90.0f;
+            float fAspectRatio = (float)GConfig::WINDOW_HEIGHT / (float)GConfig::WINDOW_WIDTH;
+            float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+
+            projectionMatrix.data[0][0] = fAspectRatio * fFovRad;
+            projectionMatrix.data[1][1] = fFovRad;
+            projectionMatrix.data[2][2] = fFar / (fFar - fNear);
+            projectionMatrix.data[3][2] = (-fFar * fNear) / (fFar - fNear);
+            projectionMatrix.data[2][3] = 1.0f;
+            projectionMatrix.data[3][3] = 0.0f;
+
+            return projectionMatrix;
+        }
+
         FVector3 MultiplyMatrixVector(const FVector3& vector, const FMatrix4x4& matrix)
         {
             FVector3 multipliedVector;

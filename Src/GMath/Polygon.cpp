@@ -11,6 +11,11 @@ namespace Granite
 {
     namespace GMath
     {
+        Polygon::Polygon() : meshPtr(nullptr)
+        {
+
+        }
+
         void Polygon::UniformMove(float scalar)
         {
             vertices[0].x += scalar;
@@ -60,6 +65,7 @@ namespace Granite
         {
             FVector3 camera; // TEMP!
             Polygon triTranslated = *this;
+            MultiplyMatrixPolygon(triTranslated, meshPtr->GetWorldTransform());
             OffsetPolygonDepth(triTranslated, 5.f);
 
             FVector3 normal, line1, line2, cameraToPoint;
@@ -77,8 +83,11 @@ namespace Granite
 
             if (dotProduct < .0f)
             {
+                // Make world transformations (for now)
+               // MultiplyMatrixPolygon(triTranslated, meshPtr->GetWorldTransform());
+
                 // Project triangles from 3D --> 2D
-               MultiplyMatrixPolygon(triTranslated, GGraphics::GetProjectionMatrix());
+                MultiplyMatrixPolygon(triTranslated, GMath::GetProjectionMatrix());
 
                 triTranslated.UniformMove(1.0f);
                 triTranslated.UniformScale(0.5f * (float)GConfig::WINDOW_WIDTH);

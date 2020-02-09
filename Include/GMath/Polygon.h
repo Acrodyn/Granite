@@ -8,12 +8,15 @@
 namespace Granite
 {
     class GTexture;
+    class Mesh;
 
 	namespace GMath
 	{
         class Polygon
         {
         public:
+            Polygon();
+            ~Polygon() = default;
 
             mutable FVector3 vertices[3];
             mutable FVector3 textureCoordinates[3];
@@ -25,6 +28,11 @@ namespace Granite
             void RasterizePolygon(Color color) const;
             void RasterizePolygon(const GTexture* texture) const;
             void RasterizePolygon(Color color, const GTexture* texture) const;
+
+        private:
+            Mesh* meshPtr;
+
+            friend Mesh;
         };
 	}
 }

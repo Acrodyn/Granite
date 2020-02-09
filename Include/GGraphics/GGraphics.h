@@ -117,7 +117,6 @@ namespace Granite
         static void UpdateScreen();
 
         static int InvertSurfaceVertically(SDL_Surface* surface);
-        static GMath::FMatrix4x4 GetProjectionMatrix();
         static void ClearScreen(Color clearColor);
         static void ClearDepthBuffer();
         static Uint32 GetPixel(SDL_Surface* textureData, int x, int y);

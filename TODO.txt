@@ -11,3 +11,4 @@
 - Position vertex?
 - izbriši thread manager, for now
 - Sredi offset problem u rendereru
+- Sve je goddamn invertano ugh

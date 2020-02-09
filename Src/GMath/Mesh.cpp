@@ -10,7 +10,7 @@ namespace Granite
 {
     namespace GMath
     {
-        Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr)
+        Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr), worldTransform(nullptr)
         {
             ModelLoader::LoadModel(*this, modelPath);
 
@@ -31,7 +31,7 @@ namespace Granite
         }
 
 
-        void Mesh::RasterizePolygons()
+        void Mesh::Rasterize()
         {
             const int threadNumber = 8;
             int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
@@ -48,7 +48,7 @@ namespace Granite
             }
         }
 
-        void Mesh::TransformPolygons(const Granite::GMath::FMatrix4x4& transformMatrix)
+        void Mesh::Transform(const Granite::GMath::FMatrix4x4& transformMatrix)
         {
             const int threadNumber = 8;
             int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
@@ -63,6 +63,16 @@ namespace Granite
             {
                 threads[i].join();
             }
+        }
+
+        void Mesh::SetWorldTransform(const FMatrix4x4& transformMatrix)
+        {
+            worldTransform = &transformMatrix;
+        }
+
+        const FMatrix4x4& Mesh::GetWorldTransform() const
+        {
+            return *worldTransform;
         }
 
         void Mesh::OffsetMesh(float offset)
@@ -108,6 +118,7 @@ namespace Granite
                 newPolygon.vertices[i] = vertices[i];
             }
 
+            newPolygon.meshPtr = &(*this);
             polygons.push_back(newPolygon);
         }
 
@@ -122,6 +133,7 @@ namespace Granite
                 newPolygon.normals[i] = normals[i];
             }
 
+            newPolygon.meshPtr = &(*this);
             polygons.push_back(newPolygon);
         }
     }
