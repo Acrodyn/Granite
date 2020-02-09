@@ -167,7 +167,6 @@ namespace Granite
                 return *(Uint32*)p;
             else
                 return *(Uint32*)p;
-            //return *(Uint32*)p;
         default:
             return 0;
         }

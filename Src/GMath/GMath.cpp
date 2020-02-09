@@ -51,6 +51,41 @@ namespace Granite
             return rotation;
         }
 
+        FMatrix4x4 GetPointAtMatrix(FVector3& pos, FVector3& target, FVector3& up)
+        {
+            FVector3 forward = target - pos;
+            forward.Normalize();
+
+            FVector3 newUp = up - (forward * up.DotProduct(forward));
+            newUp.Normalize();
+
+            FVector3 newRight = newUp.CrossProduct(forward);
+
+            FMatrix4x4 matrix;
+
+            matrix.data[0][0] = newRight.x; matrix.data[0][1] = newRight.y; matrix.data[0][2] = newRight.z; matrix.data[0][3] = 0.f;
+            matrix.data[1][0] = newUp.x; matrix.data[1][1] = newUp.y; matrix.data[1][2] = newUp.z; matrix.data[1][3] = 0.f;
+            matrix.data[2][0] = forward.x; matrix.data[2][1] = forward.y; matrix.data[2][2] = forward.z; matrix.data[2][3] = 0.f;
+            matrix.data[3][0] = pos.x; matrix.data[3][1] = pos.y; matrix.data[3][2] = pos.z; matrix.data[3][3] = 1.f;
+
+            return matrix;
+        }
+
+        FMatrix4x4 GetInverseMatrix(FMatrix4x4 &matrix) // Only for Rotation/Translation Matrices
+        {
+            FMatrix4x4 invMatrix;
+
+            invMatrix.data[0][0] = matrix.data[0][0]; invMatrix.data[0][1] = matrix.data[1][0]; invMatrix.data[0][2] = matrix.data[2][0]; invMatrix.data[0][3] = 0.0f;
+            invMatrix.data[1][0] = matrix.data[0][1]; invMatrix.data[1][1] = matrix.data[1][1]; invMatrix.data[1][2] = matrix.data[2][1]; invMatrix.data[1][3] = 0.0f;
+            invMatrix.data[2][0] = matrix.data[0][2]; invMatrix.data[2][1] = matrix.data[1][2]; invMatrix.data[2][2] = matrix.data[2][2]; invMatrix.data[2][3] = 0.0f;
+            invMatrix.data[3][0] = -(matrix.data[3][0] * invMatrix.data[0][0] + matrix.data[3][1] * invMatrix.data[1][0] + matrix.data[3][2] * invMatrix.data[2][0]);
+            invMatrix.data[3][1] = -(matrix.data[3][0] * invMatrix.data[0][1] + matrix.data[3][1] * invMatrix.data[1][1] + matrix.data[3][2] * invMatrix.data[2][1]);
+            invMatrix.data[3][2] = -(matrix.data[3][0] * invMatrix.data[0][2] + matrix.data[3][1] * invMatrix.data[1][2] + matrix.data[3][2] * invMatrix.data[2][2]);
+            invMatrix.data[3][3] = 1.0f;
+
+            return invMatrix;
+        }
+
         FVector3 MultiplyMatrixVector(const FVector3& vector, const FMatrix4x4& matrix)
         {
             FVector3 multipliedVector;
