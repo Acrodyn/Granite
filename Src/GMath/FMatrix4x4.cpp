@@ -6,10 +6,10 @@ namespace Granite
     {
         FMatrix4x4::FMatrix4x4()
         {
-            data[0][0] = 1;
+            /*data[0][0] = 1;
             data[1][1] = 1;
             data[2][2] = 1;
-            data[3][3] = 1;
+            data[3][3] = 1;*/
         }
 
         FMatrix4x4::~FMatrix4x4()
@@ -17,7 +17,26 @@ namespace Granite
 
         }
 
-        FMatrix4x4 FMatrix4x4::operator*(const FMatrix4x4& other)
+        void FMatrix4x4::MakeIdentity()
+        {
+            data[0][0] = 1.f;
+            data[1][1] = 1.f;
+            data[2][2] = 1.f;
+            data[3][3] = 1.f;
+        }
+
+        void FMatrix4x4::operator=(const FMatrix4x4& other) const
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    data[i][j] = other.data[i][j];
+                }
+            }
+        }
+
+        FMatrix4x4 FMatrix4x4::operator*(const FMatrix4x4& other) const
         {
             FMatrix4x4 newMatrix;
 

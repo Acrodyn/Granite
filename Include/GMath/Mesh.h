@@ -23,8 +23,10 @@ namespace Granite
 
             void Rasterize();
             void Transform(const Granite::GMath::FMatrix4x4 &transformMatrix);
-            void SetWorldTransform(const FMatrix4x4 &transformMatrix);
-            const FMatrix4x4& GetWorldTransform() const;
+            void SetWorldSpaceTransform(const FMatrix4x4 &transformMatrix);
+            void SetViewSpaceTransform(const FMatrix4x4& transformMatrix);
+            const FMatrix4x4& GetWorldSpaceTransform() const;
+            const FMatrix4x4& GetViewSpaceTransform() const;
             void OffsetMesh(float offset);
 
         private:
@@ -35,7 +37,8 @@ namespace Granite
 
             std::vector<Polygon> polygons;
             GTexture *meshTexture;
-            const FMatrix4x4 *worldTransform;
+            const FMatrix4x4 *worldSpaceTransform;
+            const FMatrix4x4* viewSpaceTransform;
 
             friend ModelLoader;
         };

@@ -10,9 +10,11 @@ namespace Granite
             FMatrix4x4();
             ~FMatrix4x4();
 
-            float data[4][4] = { 0 };
+            mutable float data[4][4] = { 0 };
 
-            FMatrix4x4 operator*(const FMatrix4x4& other);
+            void MakeIdentity();
+            void operator=(const FMatrix4x4& other) const;
+            FMatrix4x4 operator*(const FMatrix4x4& other) const;
 
             /* float &operator ()(int row, int column) const
              {

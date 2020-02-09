@@ -108,6 +108,21 @@ namespace Granite
             return projectionMatrix;
         }
 
+        FMatrix4x4 GetTranslationMatrix(float x, float y, float z)
+        {
+            FMatrix4x4 translatedMatrix;
+
+            translatedMatrix.data[0][0] = 1.f;
+            translatedMatrix.data[1][1] = 1.f;
+            translatedMatrix.data[2][2] = 1.f;
+            translatedMatrix.data[3][3] = 1.f;
+            translatedMatrix.data[3][0] = x;
+            translatedMatrix.data[3][1] = y;
+            translatedMatrix.data[3][2] = z;
+
+            return translatedMatrix;
+        }
+
         FVector3 MultiplyMatrixVector(const FVector3& vector, const FMatrix4x4& matrix)
         {
             FVector3 multipliedVector;

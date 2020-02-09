@@ -18,6 +18,7 @@ namespace Granite
         FMatrix4x4 GetPointAtMatrix(FVector3 &po, FVector3 &target, FVector3 &up);
         FMatrix4x4 GetInverseMatrix(FMatrix4x4& matrix);
         FMatrix4x4 GetProjectionMatrix();
+        FMatrix4x4 GetTranslationMatrix(float x, float y, float z);
 
         void MultiplyMatrixPolygon(Polygon& polygon, const FMatrix4x4& matrix);
         void MultiplyMatrixPolygon(const Polygon& iPolygon, Polygon& oPolygon, const FMatrix4x4& matrix);

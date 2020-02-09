@@ -10,7 +10,7 @@ namespace Granite
 {
     namespace GMath
     {
-        Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr), worldTransform(nullptr)
+        Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr), worldSpaceTransform(nullptr)
         {
             ModelLoader::LoadModel(*this, modelPath);
 
@@ -65,14 +65,24 @@ namespace Granite
             }
         }
 
-        void Mesh::SetWorldTransform(const FMatrix4x4& transformMatrix)
+        void Mesh::SetWorldSpaceTransform(const FMatrix4x4& transformMatrix)
         {
-            worldTransform = &transformMatrix;
+            worldSpaceTransform = &transformMatrix;
         }
 
-        const FMatrix4x4& Mesh::GetWorldTransform() const
+        void Mesh::SetViewSpaceTransform(const FMatrix4x4& transformMatrix)
         {
-            return *worldTransform;
+            viewSpaceTransform = &transformMatrix;
+        }
+
+        const FMatrix4x4& Mesh::GetWorldSpaceTransform() const
+        {
+            return *worldSpaceTransform;
+        }
+
+        const FMatrix4x4& Mesh::GetViewSpaceTransform() const
+        {
+            return *viewSpaceTransform;
         }
 
         void Mesh::OffsetMesh(float offset)

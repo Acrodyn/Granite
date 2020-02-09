@@ -31,15 +31,11 @@ int main(int argc, char* argv[])
     Granite::GMath::Mesh mesh("teapot.obj");
     mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
 
-    // TEST
     Granite::Camera camera;
     Granite::Camera::SetMainCamera(camera);
 
     Granite::GMath::FVector3 lookDir = {0, 0, 1};
     Granite::GMath::FVector3 vUp = { 0, 1, 0 };
-    // TEST
-
-    Granite::GMath::FMatrix4x4 transformMatrix;
 
     while (true)
     {
@@ -82,12 +78,22 @@ int main(int argc, char* argv[])
 
                 if (e.key.keysym.sym == SDLK_UP)
                 {
-                    Granite::Camera::GetMainCamera()->position.y -= 8.0f * deltaTime;
+                    Granite::Camera::GetMainCamera()->position.y -= 20.0f * deltaTime;
                 }
 
                 if (e.key.keysym.sym == SDLK_DOWN)
                 {
-                    Granite::Camera::GetMainCamera()->position.y += 8.0f * deltaTime;
+                    Granite::Camera::GetMainCamera()->position.y += 20.0f * deltaTime;
+                }
+
+                if (e.key.keysym.sym == SDLK_LEFT)
+                {
+                    Granite::Camera::GetMainCamera()->position.x -= 20.0f * deltaTime;
+                }
+
+                if (e.key.keysym.sym == SDLK_RIGHT)
+                {
+                    Granite::Camera::GetMainCamera()->position.x += 20.0f * deltaTime;
                 }
             }
         }
@@ -101,6 +107,13 @@ int main(int argc, char* argv[])
         Granite::GGraphics::ClearScreen(Granite::Color::Black);
         Granite::GGraphics::ClearDepthBuffer();
 
+        Granite::GMath::FMatrix4x4 transformMatrix;
+        transformMatrix.MakeIdentity();
+       // transformMatrix = Granite::GMath::GetTranslationMatrix(0.f, 0.f, 5.f); // ovo moze komotno bit u samoj matrici!
+
+        Granite::GMath::FMatrix4x4 matWorld;
+        matWorld.MakeIdentity();
+
         // Set up rotation matrices
         Granite::GMath::FVector3 vTarget = Granite::Camera::GetMainCamera()->position + lookDir;
         Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, vTarget, vUp);
@@ -108,22 +121,23 @@ int main(int argc, char* argv[])
 
         if (rotateX)
         {
-            transformMatrix = transformMatrix * Granite::GMath::GetXRotation(deltaTime * 5.5f);
+            matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * 5.5f);
         }
 
         if (rotateY)
         {
-            transformMatrix = transformMatrix * Granite::GMath::GetYRotation(deltaTime * 5.3f);
+            matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * 5.3f);
         }
 
         if (rotateZ)
         {
-            transformMatrix = transformMatrix * Granite::GMath::GetZRotation(deltaTime * 5.4f);
+            matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * 5.4f);
         }
 
-        transformMatrix = transformMatrix * matView;
+        matWorld = matWorld * transformMatrix;
 
-        mesh.SetWorldTransform(transformMatrix);
+        mesh.SetWorldSpaceTransform(matWorld);
+        mesh.SetViewSpaceTransform(matView);
         mesh.Rasterize();
         Granite::GGraphics::UpdateScreen();
     }

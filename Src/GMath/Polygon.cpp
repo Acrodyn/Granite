@@ -14,7 +14,7 @@ namespace Granite
     {
         Polygon::Polygon() : meshPtr(nullptr)
         {
-
+            transformation.MakeIdentity();
         }
 
         void Polygon::UniformMove(float scalar)
@@ -65,7 +65,8 @@ namespace Granite
         void Polygon::RasterizePolygon(Color color, const GTexture* texture) const
         {
             Polygon triTranslated = *this;
-            MultiplyMatrixPolygon(triTranslated, meshPtr->GetWorldTransform());
+            transformation = transformation * meshPtr->GetWorldSpaceTransform();
+            MultiplyMatrixPolygon(triTranslated, transformation);
             OffsetPolygonDepth(triTranslated, 5.f);
 
             FVector3 normal, line1, line2, cameraToPoint;
@@ -83,8 +84,8 @@ namespace Granite
 
             if (dotProduct < .0f)
             {
-                // Make world transformations (for now)
-               // MultiplyMatrixPolygon(triTranslated, meshPtr->GetWorldTransform());
+                // Convert World Space --> View Space
+                MultiplyMatrixPolygon(triTranslated, meshPtr->GetViewSpaceTransform());
 
                 // Project triangles from 3D --> 2D
                 MultiplyMatrixPolygon(triTranslated, GMath::GetProjectionMatrix());

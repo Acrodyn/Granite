@@ -31,6 +31,7 @@ namespace Granite
 
         private:
             Mesh* meshPtr;
+            FMatrix4x4 transformation;
 
             friend Mesh;
         };
