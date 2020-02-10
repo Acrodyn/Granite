@@ -24,14 +24,32 @@ namespace Granite
                 this->z = z;
             }
 
-            FVector3 operator-(const FVector3 vector) const
+            FVector3 operator-(const FVector3& other) const
             {
-                return FVector3(x - vector.x, y - vector.y, z - vector.z);
+                return FVector3(x - other.x, y - other.y, z - other.z);
             }
 
-            FVector3 operator+(const FVector3 vector) const
+            FVector3 operator+(const FVector3& other) const
             {
-                return FVector3(x + vector.x, y + vector.y, z + vector.z);
+                return FVector3(x + other.x, y + other.y, z + other.z);
+            }
+
+            FVector3& operator+=(const FVector3& other)
+            {
+                x += other.x;
+                y += other.y;
+                z += other.z;
+
+                return *this;
+            }
+
+            FVector3& operator-=(const FVector3& other)
+            {
+                x -= other.x;
+                y -= other.y;
+                z -= other.z;
+
+                return *this;
             }
 
             template<typename T>
@@ -40,7 +58,7 @@ namespace Granite
                 return FVector3(x * scalar, y * scalar, z * scalar);
             }
 
-            void operator=(const FVector3 vector)
+            void operator=(const FVector3& vector)
             {
                 this->x = vector.x;
                 this->y = vector.y;
@@ -54,7 +72,7 @@ namespace Granite
                 this->z = z;
             }
 
-            void SetData(FVector3 vector)
+            void SetData(const FVector3& vector)
             {
                 this->x = vector.x;
                 this->y = vector.y;
@@ -80,12 +98,12 @@ namespace Granite
                 z /= length;
             }
 
-            float DotProduct(FVector3 vector)
+            float DotProduct(const FVector3& vector) const
             {
                 return x * vector.x + y * vector.y + z * vector.z;
             }
 
-            FVector3 CrossProduct(FVector3 vector)
+            FVector3 CrossProduct(const FVector3& vector) const
             {
                 return FVector3(y * vector.z - z * vector.y, z * vector.x - x * vector.z, x * vector.y - y * vector.x);
             }

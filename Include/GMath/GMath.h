@@ -15,7 +15,11 @@ namespace Granite
         FMatrix4x4 GetYRotation(float angle);
         FMatrix4x4 GetZRotation(float angle);
 
-        FMatrix4x4 GetPointAtMatrix(FVector3 &po, FVector3 &target, FVector3 &up);
+        FVector3 GetUpVector();
+        FVector3 GetForwardVector();
+        FVector3 GetRightVector();
+
+        FMatrix4x4 GetPointAtMatrix(const FVector3 &po, const FVector3 &target, const FVector3 &up);
         FMatrix4x4 GetInverseMatrix(FMatrix4x4& matrix);
         FMatrix4x4 GetProjectionMatrix();
         FMatrix4x4 GetTranslationMatrix(float x, float y, float z);

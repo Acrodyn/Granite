@@ -12,7 +12,6 @@
 #include "GMath/FVector3.h"
 #include "GMath/Polygon.h"
 #include "GGraphics/Colors.h"
-#include "GThread/ThreadManager.h"
 
 int main(int argc, char* argv[])
 {
@@ -26,9 +25,9 @@ int main(int argc, char* argv[])
     float endTime = 0;
     float milisecondsPerFrame = 16.f;
     float fps = 0;
-    bool rotateX, rotateY, rotateZ;
 
     float cameraSpeed = 50.f;
+    float fYaw = 0.f;
 
     Granite::GMath::Mesh mesh("axis.obj");
     mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
@@ -37,14 +36,8 @@ int main(int argc, char* argv[])
     Granite::Camera camera;
     Granite::Camera::SetMainCamera(camera);
 
-    Granite::GMath::FVector3 forwardVector = {0, 0, 1};
-    Granite::GMath::FVector3 upVector = { 0, 1, 0 };
-
     while (true)
     {
-        rotateX = false;
-        rotateY = false;
-        rotateZ = false;
 
         endTime = SDL_GetTicks();
         milisecondsPassed = endTime - startTime;
@@ -58,23 +51,35 @@ int main(int argc, char* argv[])
 
         printf("FPS is: %f \n", 1000.f / milisecondsPassed);
 
+        Granite::GGraphics::ClearScreen(Granite::Color::Black);
+        Granite::GGraphics::ClearDepthBuffer();
+
+        Granite::GMath::FMatrix4x4 transformMatrix;
+        transformMatrix.MakeIdentity();
+        //transformMatrix = Granite::GMath::GetTranslationMatrix(0.f, 0.f, 5.f); // ovo moze komotno bit u samoj matrici!
+
+        Granite::GMath::FMatrix4x4 matWorld;
+        matWorld.MakeIdentity();
+
+        Granite::GMath::FVector3 vForward = Granite::Camera::GetMainCamera()->forward * (cameraSpeed * deltaTime);
+
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_KEYDOWN)
             {
-                if (e.key.keysym.sym == SDLK_q)
+                if (e.key.keysym.sym == SDLK_1)
                 {
-                    rotateX = true;
+                    matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * 5.5f);
                 }
 
-                if (e.key.keysym.sym == SDLK_w)
+                if (e.key.keysym.sym == SDLK_2)
                 {
-                    rotateY = true;
+                    matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * 5.3f);
                 }
 
-                if (e.key.keysym.sym == SDLK_e)
+                if (e.key.keysym.sym == SDLK_3)
                 {
-                    rotateZ = true;
+                    matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * 5.4f);
                 }
 
                 if (e.key.keysym.sym == SDLK_UP)
@@ -87,6 +92,7 @@ int main(int argc, char* argv[])
                     Granite::Camera::GetMainCamera()->position.y += cameraSpeed * deltaTime;
                 }
 
+                // ovo ne radi dobro zbog pukog x-a
                 if (e.key.keysym.sym == SDLK_LEFT)
                 {
                     Granite::Camera::GetMainCamera()->position.x -= cameraSpeed * deltaTime;
@@ -95,6 +101,26 @@ int main(int argc, char* argv[])
                 if (e.key.keysym.sym == SDLK_RIGHT)
                 {
                     Granite::Camera::GetMainCamera()->position.x += cameraSpeed * deltaTime;
+                }
+
+                if (e.key.keysym.sym == SDLK_a)
+                {
+                    fYaw += 3.f * deltaTime;
+                }
+
+                if (e.key.keysym.sym == SDLK_d)
+                {
+                    fYaw -= 3.f * deltaTime;
+                }
+
+                if (e.key.keysym.sym == SDLK_w)
+                {
+                    Granite::Camera::GetMainCamera()->position += vForward;
+                }
+
+                if (e.key.keysym.sym == SDLK_s)
+                {
+                    Granite::Camera::GetMainCamera()->position -= vForward;
                 }
             }
         }
@@ -105,34 +131,9 @@ int main(int argc, char* argv[])
             break;
         }
 
-        Granite::GGraphics::ClearScreen(Granite::Color::Black);
-        Granite::GGraphics::ClearDepthBuffer();
-
-        Granite::GMath::FMatrix4x4 transformMatrix;
-        transformMatrix.MakeIdentity();
-       //transformMatrix = Granite::GMath::GetTranslationMatrix(0.f, 0.f, 5.f); // ovo moze komotno bit u samoj matrici!
-
-        Granite::GMath::FMatrix4x4 matWorld;
-        matWorld.MakeIdentity();
-
-        Granite::GMath::FVector3 vTarget = Granite::Camera::GetMainCamera()->position + forwardVector;
-        Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, vTarget, upVector);
+        Granite::Camera::GetMainCamera()->forward = Granite::GMath::MultiplyMatrixVector(Granite::GMath::GetForwardVector(), Granite::GMath::GetYRotation(fYaw));
+        Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, Granite::Camera::GetMainCamera()->GetTarget(), Granite::GMath::GetUpVector());
         Granite::GMath::FMatrix4x4 matView = Granite::GMath::GetInverseMatrix(matCamera);
-
-        if (rotateX)
-        {
-            matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * 5.5f);
-        }
-
-        if (rotateY)
-        {
-            matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * 5.3f);
-        }
-
-        if (rotateZ)
-        {
-            matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * 5.4f);
-        }
 
         matWorld = matWorld * transformMatrix;
 

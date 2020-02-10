@@ -4,6 +4,11 @@ namespace Granite
 {
 	Camera* Camera::mainCamera = nullptr;
 
+	Camera::Camera()
+	{
+		forward = { 0, 0, 1 };
+	}
+
 	void Camera::SetMainCamera(Camera& camera, bool deleteOldCamera)
 	{
 		if (deleteOldCamera && mainCamera)
@@ -17,5 +22,10 @@ namespace Granite
 	Camera* const Camera::GetMainCamera()
 	{
 		return mainCamera;
+	}
+
+	GMath::FVector3 Camera::GetTarget() const
+	{
+		return position + forward;
 	}
 }

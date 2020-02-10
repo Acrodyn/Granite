@@ -51,7 +51,22 @@ namespace Granite
             return rotation;
         }
 
-        FMatrix4x4 GetPointAtMatrix(FVector3& pos, FVector3& target, FVector3& up)
+        FVector3 GetUpVector()
+        {
+            return FVector3(0, 1, 0);
+        }
+
+        FVector3 GetForwardVector()
+        {
+            return FVector3(0, 0, 1);
+        }
+
+        FVector3 GetRightVector()
+        {
+            return FVector3(1, 0, 0);
+        }
+
+        FMatrix4x4 GetPointAtMatrix(const FVector3& pos, const FVector3& target, const FVector3& up)
         {
             FVector3 forward = target - pos;
             forward.Normalize();
