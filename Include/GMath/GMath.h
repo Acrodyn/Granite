@@ -19,6 +19,9 @@ namespace Granite
         FVector3 GetForwardVector();
         FVector3 GetRightVector();
 
+        FVector3 VectorIntersectPlane(FVector3 &plane_p, FVector3 &plane_n, FVector3 &lineStart, FVector3 &lineEnd);
+        int ClipAgainstPlane(FVector3 &&plane_p, FVector3 &&plane_n, Polygon &inPoly, Polygon &outPoly1, Polygon &outPoly2);
+
         FMatrix4x4 GetPointAtMatrix(const FVector3 &po, const FVector3 &target, const FVector3 &up);
         FMatrix4x4 GetInverseMatrix(FMatrix4x4& matrix);
         FMatrix4x4 GetProjectionMatrix();

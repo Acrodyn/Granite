@@ -25,13 +25,17 @@ namespace Granite
             void UniformMove(float scalar);
             void UniformScale(float scalar);
             void TransformPolygon(const FMatrix4x4& transformMatrix);
+            void CopyTextureCoordinates(const Polygon &other);
             void RasterizePolygon(Color color) const;
             void RasterizePolygon(const GTexture* texture) const;
             void RasterizePolygon(Color color, const GTexture* texture) const;
 
         private:
+            mutable float _intensity;
             Mesh* meshPtr;
             FMatrix4x4 transformation;
+
+            void _DrawClippedPolygon(const std::vector<Polygon> &clippedPolygons) const;
 
             friend Mesh;
         };

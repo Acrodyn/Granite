@@ -89,6 +89,19 @@ namespace Granite
                 return x * x + y * y + z * z;
             }
 
+            FVector3 ReturnNormalized()
+            {
+                FVector3 normalizedVector = *this;
+
+                float length = GetLength();
+
+                normalizedVector.x /= length;
+                normalizedVector.y /= length;
+                normalizedVector.z /= length;
+
+                return normalizedVector;
+            }
+
             void Normalize()
             {
                 float length = GetLength();

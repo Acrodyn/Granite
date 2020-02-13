@@ -46,6 +46,8 @@ namespace Granite
             {
                 threads[i].join();
             }
+
+            // TODO: possible mutex usage for separate rasterization and drawing?
         }
 
         void Mesh::Transform(const Granite::GMath::FMatrix4x4& transformMatrix)

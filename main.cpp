@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     float cameraSpeed = 50.f;
     float fYaw = 0.f;
 
-    Granite::GMath::Mesh mesh("axis.obj");
+    Granite::GMath::Mesh mesh("mountains.obj");
     mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
     mesh.Transform(Granite::GMath::GetYRotation(Granite::GMath::AnglesToRadians(180.f)));
 
@@ -38,7 +38,6 @@ int main(int argc, char* argv[])
 
     while (true)
     {
-
         endTime = SDL_GetTicks();
         milisecondsPassed = endTime - startTime;
         deltaTime = milisecondsPassed / 1000.f;

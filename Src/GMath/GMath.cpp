@@ -66,6 +66,104 @@ namespace Granite
             return FVector3(1, 0, 0);
         }
 
+        FVector3 VectorIntersectPlane(FVector3& plane_p, FVector3& plane_n, FVector3& lineStart, FVector3& lineEnd)
+        {
+            plane_n.Normalize();
+            float plane_d = -(plane_n.DotProduct(plane_p));
+            float ad = lineStart.DotProduct(plane_n);
+            float bd = lineEnd.DotProduct(plane_n);
+            float t = (-plane_d - ad) / (bd - ad);
+            FVector3 lineStartToEnd = lineEnd - lineStart;
+            FVector3 lineToIntersect = lineStartToEnd * t;
+            return (lineStart + lineToIntersect);
+        }
+
+        int ClipAgainstPlane(FVector3 &&plane_p, FVector3 &&plane_n, Polygon& inPoly, Polygon& outPoly1, Polygon& outPoly2)
+        {
+            plane_n.Normalize();
+
+            auto dist = [&](const FVector3& p)
+            {
+                return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - plane_n.DotProduct(plane_p));
+            };
+
+            FVector3 *insidePoints[3]; 
+            FVector3 *outsidePoints[3];
+
+            int insidePointCount = 0;
+            int outsidePointCount = 0;
+
+            float d0 = dist(inPoly.vertices[0]);
+            float d1 = dist(inPoly.vertices[1]);
+            float d2 = dist(inPoly.vertices[2]);
+
+            if (d0 >= 0)
+            {
+                insidePoints[insidePointCount++] = &inPoly.vertices[0];
+            }
+            else
+            {
+                outsidePoints[outsidePointCount++] = &inPoly.vertices[0];
+            }
+
+            if (d1 > 0)
+            {
+                insidePoints[insidePointCount++] = &inPoly.vertices[1];
+            }
+            else
+            {
+                outsidePoints[outsidePointCount++] = &inPoly.vertices[1];
+            }
+
+            if (d2 > 0)
+            {
+                insidePoints[insidePointCount++] = &inPoly.vertices[2];
+            }
+            else
+            {
+                outsidePoints[outsidePointCount++] = &inPoly.vertices[2];
+            }
+
+            if (insidePointCount == 0)
+            {
+                return 0;
+            }
+
+            if (insidePointCount == 3)
+            {
+                outPoly1 = inPoly;
+
+                return 1;
+            }
+
+            if (insidePointCount == 1 && outsidePointCount == 2)
+            {
+                outPoly1.CopyTextureCoordinates(inPoly);
+
+                outPoly1.vertices[0] = *insidePoints[0];
+                outPoly1.vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
+                outPoly1.vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);
+
+                return 1;
+            }
+
+            if (insidePointCount == 2 && outsidePointCount == 1)
+            {
+                outPoly1.CopyTextureCoordinates(inPoly);
+                outPoly2.CopyTextureCoordinates(inPoly);
+
+                outPoly1.vertices[0] = *insidePoints[0];
+                outPoly1.vertices[1] = *insidePoints[1];
+                outPoly1.vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
+
+                outPoly2.vertices[0] = *insidePoints[1];
+                outPoly2.vertices[1] = outPoly1.vertices[2];
+                outPoly2.vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[1], *outsidePoints[0]);
+
+                return 2;
+            }
+        }
+
         FMatrix4x4 GetPointAtMatrix(const FVector3& pos, const FVector3& target, const FVector3& up)
         {
             FVector3 forward = target - pos;
