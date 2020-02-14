@@ -13,7 +13,7 @@ namespace Granite
 {
     namespace GMath
     {
-        Polygon::Polygon() : meshPtr(nullptr)
+        Polygon::Polygon() : meshPtr(nullptr), _intensity(0.f)
         {
             transformation.MakeIdentity();
         }
@@ -72,10 +72,17 @@ namespace Granite
 
         void Polygon::RasterizePolygon(Color color, const GTexture* texture) const
         {
+            std::vector<Polygon> projectedPolygons = _GetProjectedPolygons();
+            std::vector<Polygon> clippedPolygons = _GetClippedPolygon(projectedPolygons);
+            _DrawClippedPolygons(clippedPolygons, color, texture);
+        }
+
+        std::vector<Polygon> Polygon::_GetProjectedPolygons() const
+        {
             Polygon triTranslated = *this;
             transformation = transformation * meshPtr->GetWorldSpaceTransform(); // TODO: možda mogu direkt ovo napravit?
             MultiplyMatrixPolygon(triTranslated, transformation);
-            OffsetPolygonDepth(triTranslated, 15.f);
+            OffsetPolygonDepth(triTranslated, 1800.f);
 
             FVector3 normal, line1, line2, cameraToPoint;
 
@@ -92,14 +99,15 @@ namespace Granite
 
             if (dotProduct < .0f)
             {
-                std::vector<Polygon> clippedPolygons;
+                std::vector<Polygon> frustumClippedPolygons;
                 _intensity = GUtil::Abs(dotProduct);
-                   
+
                 // Convert World Space --> View Space
                 MultiplyMatrixPolygon(triTranslated, meshPtr->GetViewSpaceTransform());
 
+                // Clip front of frustum
                 Polygon clipped[2];
-                int clippedTriangles = ClipAgainstPlane(FVector3(0.f, 0.f, 0.1f), FVector3(0.f, 0.f, 1.f), triTranslated, clipped[0], clipped[1]);
+                int clippedTriangles = ClipAgainstPlane(FVector3(0.f, 0.f, 0.1f), GMath::GetForwardVector(), triTranslated, clipped[0], clipped[1]);
 
                 for (int i = 0; i < clippedTriangles; ++i)
                 {
@@ -109,105 +117,105 @@ namespace Granite
                     clipped[i].UniformMove(1.0f);
                     clipped[i].UniformScale(0.5f * (float)GConfig::WINDOW_WIDTH);
 
-                    clippedPolygons.push_back(clipped[i]);
+                    frustumClippedPolygons.push_back(clipped[i]);
                 }
 
-                _DrawClippedPolygon(clippedPolygons);
+                return frustumClippedPolygons;
             }
         }
 
-        void Polygon::_DrawClippedPolygon(const std::vector<Polygon> &clippedPolygons) const
+        std::vector<Polygon> Polygon::_GetClippedPolygon(const std::vector<Polygon> &polygonsToClip) const
         {
-            for (auto &poly : clippedPolygons)
+            std::vector<Polygon> clippedPolygons;
+
+            for (auto &polygon : polygonsToClip)
             {
                 Polygon clipped[2];
-                std::list<Polygon> metaClipPolys;
-
-                metaClipPolys.push_back(poly);
+                clippedPolygons.push_back(polygon);
                 int newTriangles = 1;
 
-                for (int i = 0; i < 5; ++i)
+                for (int i = 0; i < 4; ++i)
                 {
                     int polysToAdd = 0;
 
                     while (newTriangles > 0)
                     {
-                        Polygon testPoly = metaClipPolys.front();
-                        metaClipPolys.pop_front();
+                        Polygon testPoly = clippedPolygons.back();
+                        clippedPolygons.pop_back();
                         --newTriangles;
 
                         switch (i)
                         {
                             case 0:
                             {
-                                polysToAdd = ClipAgainstPlane(FVector3(0.f, 0.f, 0.f), FVector3(0.f, 1.f, 0.f), testPoly, clipped[0], clipped[1]);
+                                polysToAdd = ClipAgainstPlane(FVector3(), GMath::GetUpVector(), testPoly, clipped[0], clipped[1]);
                                 break;
                             }
                             case 1:
                             {
-                                polysToAdd = ClipAgainstPlane(FVector3(0.f, GConfig::WINDOW_HEIGHT - 1.f, 0.f), FVector3(0.f, -1.f, 0.f), testPoly, clipped[0], clipped[1]);
+                                polysToAdd = ClipAgainstPlane(FVector3(0.f, GConfig::WINDOW_HEIGHT - 1.f, 0.f), GMath::GetUpVector() * -1, testPoly, clipped[0], clipped[1]);
                                 break;
                             }
                             case 2:
                             {
-                                polysToAdd = ClipAgainstPlane(FVector3(0.f, 0.f, 0.f), FVector3(1.f, 0.f, 0.f), testPoly, clipped[0], clipped[1]);
+                                polysToAdd = ClipAgainstPlane(FVector3(0.f, 0.f, 0.f), GMath::GetRightVector(), testPoly, clipped[0], clipped[1]);
                                 break;
                             }
                             case 3:
                             {
-                                polysToAdd = ClipAgainstPlane(FVector3(GConfig::WINDOW_WIDTH - 1.f, 0.f, 0.f), FVector3(-1.f, 0.f, 0.f), testPoly, clipped[0], clipped[1]);
-                                break;
-                            }
-                            case 4:
-                            {
-                                polysToAdd = ClipAgainstPlane(FVector3(0.f, 0.f, 0.1f), FVector3(0.f, 0.f, 1.f), testPoly, clipped[0], clipped[1]);
+                                polysToAdd = ClipAgainstPlane(FVector3(GConfig::WINDOW_WIDTH - 1.f, 0.f, 0.f), GMath::GetRightVector() * -1, testPoly, clipped[0], clipped[1]);
                                 break;
                             }
                         }
 
                         for (int j = 0; j < polysToAdd; ++j)
                         {
-                            metaClipPolys.push_back(clipped[j]);
+                            clippedPolygons.push_back(clipped[j]);
                         }
                     }
 
-                    newTriangles = metaClipPolys.size();
+                    newTriangles = clippedPolygons.size();
+                }
+            }
+
+            return clippedPolygons;
+        }
+
+        void Polygon::_DrawClippedPolygons(std::vector<Polygon> &polygonsToDraw, Color color, const GTexture* texture) const
+        {
+            for (auto& polyToDraw : polygonsToDraw)
+            {
+                if (GConfig::WIREFRAME_MODE)
+                {
+                    GGraphics::DrawLine(
+                        GMath::IPoint(polyToDraw.vertices[0].x, polyToDraw.vertices[0].y),
+                        GMath::IPoint(polyToDraw.vertices[1].x, polyToDraw.vertices[1].y),
+                        Color::Red);
+
+                    GGraphics::DrawLine(
+                        GMath::IPoint(polyToDraw.vertices[1].x, polyToDraw.vertices[1].y),
+                        GMath::IPoint(polyToDraw.vertices[2].x, polyToDraw.vertices[2].y),
+                        Color::Red);
+
+                    GGraphics::DrawLine(
+                        GMath::IPoint(polyToDraw.vertices[2].x, polyToDraw.vertices[2].y),
+                        GMath::IPoint(polyToDraw.vertices[0].x, polyToDraw.vertices[0].y),
+                        Color::Red);
                 }
 
-                for (auto &polyToDraw : metaClipPolys)
+                if (GConfig::RASTERIZE)
                 {
-                        if (GConfig::WIREFRAME_MODE)
+                    /* GGraphics::Pixel newColor(128, 128, 128);
+                     newColor.SetIntensity(_intensity);
+                     Granite::GGraphics::RasterizeTriangle(polyToDraw, newColor);*/
+
+                    if (texture != nullptr)
                     {
-                        GGraphics::DrawLine(
-                            GMath::IPoint(polyToDraw.vertices[0].x, polyToDraw.vertices[0].y),
-                            GMath::IPoint(polyToDraw.vertices[1].x, polyToDraw.vertices[1].y),
-                            Color::Red);
-
-                        GGraphics::DrawLine(
-                            GMath::IPoint(polyToDraw.vertices[1].x, polyToDraw.vertices[1].y),
-                            GMath::IPoint(polyToDraw.vertices[2].x, polyToDraw.vertices[2].y),
-                            Color::Red);
-
-                        GGraphics::DrawLine(
-                            GMath::IPoint(polyToDraw.vertices[2].x, polyToDraw.vertices[2].y),
-                            GMath::IPoint(polyToDraw.vertices[0].x, polyToDraw.vertices[0].y),
-                            Color::Red);
+                        GGraphics::RasterizeTriangle(polyToDraw, &(*texture));
                     }
-
-                    if (GConfig::RASTERIZE)
+                    else
                     {
-                        GGraphics::Pixel newColor(128, 128, 128);
-                        newColor.SetIntensity(_intensity);
-                        Granite::GGraphics::RasterizeTriangle(polyToDraw, newColor);
-
-                        /* if (texture != nullptr)
-                           {
-                               GGraphics::RasterizeTriangle(triTranslated, &(*texture));
-                           }
-                           else
-                           {
-                               GGraphics::RasterizeTriangle(triTranslated, color);
-                           }*/
+                        GGraphics::RasterizeTriangle(polyToDraw, color);
                     }
                 }
             }

@@ -53,20 +53,20 @@ namespace Granite
 
         FVector3 GetUpVector()
         {
-            return FVector3(0, 1, 0);
+            return FVector3(0.f, 1.f, 0.f);
         }
 
         FVector3 GetForwardVector()
         {
-            return FVector3(0, 0, 1);
+            return FVector3(0.f, 0.f, 1.f);
         }
 
         FVector3 GetRightVector()
         {
-            return FVector3(1, 0, 0);
+            return FVector3(1.f, 0.f, 0.f);
         }
 
-        FVector3 VectorIntersectPlane(FVector3& plane_p, FVector3& plane_n, FVector3& lineStart, FVector3& lineEnd)
+        FVector3 VectorIntersectPlane(FVector3 &plane_p, FVector3 &plane_n, FVector3 &lineStart, FVector3 &lineEnd)
         {
             plane_n.Normalize();
             float plane_d = -(plane_n.DotProduct(plane_p));
@@ -78,7 +78,7 @@ namespace Granite
             return (lineStart + lineToIntersect);
         }
 
-        int ClipAgainstPlane(FVector3 &&plane_p, FVector3 &&plane_n, Polygon& inPoly, Polygon& outPoly1, Polygon& outPoly2)
+        int ClipAgainstPlane(FVector3 &&plane_p, FVector3 &&plane_n, Polygon &inPoly, Polygon &outPoly1, Polygon &outPoly2)
         {
             plane_n.Normalize();
 

@@ -26,10 +26,10 @@ int main(int argc, char* argv[])
     float milisecondsPerFrame = 16.f;
     float fps = 0;
 
-    float cameraSpeed = 50.f;
+    float cameraSpeed = 850.f;
     float fYaw = 0.f;
 
-    Granite::GMath::Mesh mesh("mountains.obj");
+    Granite::GMath::Mesh mesh("Jess.obj", "JessTex.png");
     mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
     mesh.Transform(Granite::GMath::GetYRotation(Granite::GMath::AnglesToRadians(180.f)));
 

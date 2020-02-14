@@ -35,7 +35,9 @@ namespace Granite
             Mesh* meshPtr;
             FMatrix4x4 transformation;
 
-            void _DrawClippedPolygon(const std::vector<Polygon> &clippedPolygons) const;
+            std::vector<Polygon> _GetProjectedPolygons() const;
+            std::vector<Polygon> _GetClippedPolygon(const std::vector<Polygon> &polygonsToClip) const;
+            void _DrawClippedPolygons(std::vector<Polygon> &polygonsToDraw, Color color, const GTexture* texture) const;
 
             friend Mesh;
         };
