@@ -34,6 +34,24 @@ namespace Granite
             _intensity = other._intensity;
         }
 
+        void Polygon::RepositionVertices(Uint8 index, const FVector3& newPosition)
+        {
+            /*outPolygons[0]->vertices[0] = *insidePoints[0];
+            outPolygons[0]->vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
+            outPolygons[0]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);*/
+
+            float changeX = (newPosition.x - vertices[index].x) / vertices[index].x;
+            float changeY = (newPosition.y - vertices[index].y) / vertices[index].y;
+
+            float textChangeX = GUtil::Clamp(textureCoordinates[index].x + textureCoordinates[index].x * changeX, 0.f, 1.f);
+            float textChangeY = GUtil::Clamp(textureCoordinates[index].y + textureCoordinates[index].y * changeY, 0.f, 1.f);
+
+            textureCoordinates[index].x = textChangeX;
+            textureCoordinates[index].y = textChangeY;
+
+            vertices[index] = newPosition;
+        }
+
         void Polygon::Move(Polygon&& other)
         {
             for (int i = 0; i < 3; ++i)
@@ -106,11 +124,6 @@ namespace Granite
             Polygon *projectedPolygons[2]{};
             Polygon *clippedPolygonsStash[16]{}; // max number of clipped polys!
 
-          // std::unique_ptr<Polygon> projectedPolygons[2];
-          // std::unique_ptr<Polygon> clippedPolygonsStash[16];
-
-
-
            _GetProjectedPolygons(triTranslated, projectedPolygons);
 
             if (projectedPolygons[0] == nullptr)
@@ -162,7 +175,8 @@ namespace Granite
                 MultiplyMatrixPolygon(transformPolygon, meshPtr->GetViewSpaceTransform());
 
                 // Clip front of frustum
-                int clippedTriangles = ClipAgainstPlane(FVector3(0.f, 0.f, 0.1f), GMath::GetForwardVector(), transformPolygon, polygons);
+                int clippedTriangles = ClipAgainstPlane(FVector3(0.f, 
+                    0.f, 0.1f), GMath::GetForwardVector(), transformPolygon, polygons);
 
                 for (int i = 0; i < clippedTriangles; ++i)
                 {

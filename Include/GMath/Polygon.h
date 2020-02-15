@@ -25,6 +25,7 @@ namespace Granite
             mutable FVector3 textureCoordinates[3];
             //mutable FVector3 normals[3];
 
+            void RepositionVertices(Uint8 index, const FVector3 &newPosition);
             void UniformMove(float scalar);
             void UniformScale(float scalar);
             void TransformPolygon(const FMatrix4x4& transformMatrix);
@@ -34,8 +35,8 @@ namespace Granite
             void RasterizePolygon(Color color, const GTexture* texture) const;
 
         private:
-            mutable float _intensity;
             bool _fragment;
+            mutable float _intensity;
             Mesh* meshPtr;
             FMatrix4x4 transformation;
 
