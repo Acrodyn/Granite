@@ -1,5 +1,6 @@
 #pragma once
 #include "FVector3.h"
+#include <memory>
 
 namespace Granite
 {
@@ -20,7 +21,7 @@ namespace Granite
         FVector3 GetRightVector();
 
         FVector3 VectorIntersectPlane(const FVector3 &plane_p, const FVector3 &plane_n, FVector3 &lineStart, FVector3 &lineEnd);
-        int ClipAgainstPlane(const FVector3 &plane_p, const FVector3 &plane_n, Polygon &inPoly, Polygon **outPolygons);
+        int ClipAgainstPlane(const FVector3 &plane_p, const FVector3 &plane_n, Polygon& inPoly, Polygon** outPolygons);
 
         FMatrix4x4 GetPointAtMatrix(const FVector3 &po, const FVector3 &target, const FVector3 &up);
         FMatrix4x4 GetInverseMatrix(FMatrix4x4& matrix);

@@ -77,7 +77,7 @@ namespace Granite
             return (lineStart + lineToIntersect);
         }
 
-        int ClipAgainstPlane(const FVector3 &plane_p, const FVector3 &plane_n, Polygon &inPoly, Polygon **outPolygons)
+        int ClipAgainstPlane(const FVector3& plane_p, const FVector3& plane_n, Polygon &inPoly, Polygon** outPolygons)
         {
             //plane_n.Normalize();
 
@@ -127,21 +127,24 @@ namespace Granite
                 return 0;
             }
 
+            //polygonClipped = true;
+
             if (insidePointCount == 3)
             {
                 outPolygons[0] = &inPoly;
-
+                //outPolygons[0] = new Polygon(inPoly);
+                
                 return 1;
             }
 
             if (insidePointCount == 1 && outsidePointCount == 2)
             {
                 //outPoly1.CopyTextureCoordinates(inPoly);
-                outPolygons[0] = new Polygon(inPoly);
+                outPolygons[0] = &inPoly; 
 
-                (outPolygons[0])->vertices[0] = *insidePoints[0];
-                (outPolygons[0])->vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
-                (outPolygons[0])->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);
+                outPolygons[0]->vertices[0] = *insidePoints[0];
+                outPolygons[0]->vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
+                outPolygons[0]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);
 
                 return 1;
             }
@@ -150,16 +153,16 @@ namespace Granite
             {
             /*    outPoly1.CopyTextureCoordinates(inPoly);
                 outPoly2.CopyTextureCoordinates(inPoly);*/
-                outPolygons[0] = new Polygon(inPoly);
-                outPolygons[1] = new Polygon(inPoly);
+                outPolygons[0] = &inPoly;
+                outPolygons[1] = new Polygon(inPoly, true);
 
-                (outPolygons[0])->vertices[0] = *insidePoints[0];
-                (outPolygons[0])->vertices[1] = *insidePoints[1];
-                (outPolygons[0])->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
+                outPolygons[0]->vertices[0] = *insidePoints[0];
+                outPolygons[0]->vertices[1] = *insidePoints[1];
+                outPolygons[0]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
 
-                (outPolygons[1])->vertices[0] = *insidePoints[1];
-                (outPolygons[1])->vertices[1] = (outPolygons[0])->vertices[2];
-                (outPolygons[1])->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[1], *outsidePoints[0]);
+                outPolygons[1]->vertices[0] = *insidePoints[1];
+                outPolygons[1]->vertices[1] = outPolygons[0]->vertices[2];
+                outPolygons[1]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[1], *outsidePoints[0]);
 
                 return 2;
             }

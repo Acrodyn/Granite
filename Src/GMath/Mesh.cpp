@@ -142,7 +142,7 @@ namespace Granite
             {
                 newPolygon.vertices[i] = vertices[i];
                 newPolygon.textureCoordinates[i] = textureCoords[i];
-                newPolygon.normals[i] = normals[i];
+                //newPolygon.normals[i] = normals[i];
             }
 
             newPolygon.meshPtr = &(*this);

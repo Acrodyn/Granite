@@ -8,14 +8,30 @@
 #include "GGraphics/GTexture.h"
 #include "GGraphics/Colors.h"
 #include "GGraphics/Camera.h"
+#include <memory>
 
 namespace Granite
 {
     namespace GMath
     {
-        Polygon::Polygon() : meshPtr(nullptr), _intensity(0.f)
+        Polygon::Polygon() : meshPtr(nullptr), _fragment(false), _intensity(0.f)
         {
             transformation.MakeIdentity();
+        }
+
+        Polygon::Polygon(const Polygon& other, bool isFragment)
+        {
+            _fragment = isFragment;
+
+            for (int i = 0; i < 3; ++i)
+            {
+                vertices[i] = other.vertices[i];
+                textureCoordinates[i] = other.textureCoordinates[i];
+            }
+
+            transformation = other.transformation;
+            meshPtr = other.meshPtr;
+            _intensity = other._intensity;
         }
 
         void Polygon::Move(Polygon&& other)
@@ -24,7 +40,7 @@ namespace Granite
             {
                 vertices[i] = other.vertices[i];
                 textureCoordinates[i] = other.textureCoordinates[i];
-                normals[i] = other.normals[i];
+                //normals[i] = other.normals[i];
             }
 
             _intensity = other._intensity;
@@ -87,10 +103,15 @@ namespace Granite
         void Polygon::RasterizePolygon(Color color, const GTexture* texture) const
         {
             Polygon triTranslated = *this;
-            Polygon* projectedPolygons[2]{};
-            Polygon* clippedPolygonsStash[16]{}; // max number of clipped polys!
+            Polygon *projectedPolygons[2]{};
+            Polygon *clippedPolygonsStash[16]{}; // max number of clipped polys!
 
-            _GetProjectedPolygons(triTranslated, projectedPolygons);
+          // std::unique_ptr<Polygon> projectedPolygons[2];
+          // std::unique_ptr<Polygon> clippedPolygonsStash[16];
+
+
+
+           _GetProjectedPolygons(triTranslated, projectedPolygons);
 
             if (projectedPolygons[0] == nullptr)
             {
@@ -99,21 +120,23 @@ namespace Granite
 
            _GetClippedPolygon(projectedPolygons, clippedPolygonsStash);
            _DrawClippedPolygons(clippedPolygonsStash, color, texture);
-            
-      /*      for (int i = 0; i < 16; ++i)
-            {
-                if (clippedPolygonsStash[i] == nullptr)
-                {
-                    break;
-                }
-                Polygon* deleter = clippedPolygonsStash[i];
-                delete deleter;
-            }*/
+
+           for (int i = 0; i < 16; ++i)
+           {
+               if (clippedPolygonsStash[i] == nullptr)
+               {
+                   break;
+               }
+
+               if (clippedPolygonsStash[i]->_fragment)
+               {
+                   delete clippedPolygonsStash[i];
+               }
+           }
         }
 
         void Polygon::_GetProjectedPolygons(Polygon &transformPolygon, Polygon** polygons) const
         {
-           // Polygon triTranslated = *this;
             transformation = transformation * meshPtr->GetWorldSpaceTransform(); // TODO: možda mogu direkt ovo napravit?
             MultiplyMatrixPolygon(transformPolygon, transformation);
             OffsetPolygonDepth(transformPolygon, 1800.f);
@@ -133,7 +156,6 @@ namespace Granite
 
             if (dotProduct < .0f)
             {
-                //std::vector<Polygon> frustumClippedPolygons;
                 _intensity = GUtil::Abs(dotProduct);
 
                 // Convert World Space --> View Space
@@ -149,19 +171,13 @@ namespace Granite
 
                     polygons[i]->UniformMove(1.0f);
                     polygons[i]->UniformScale(0.5f * (float)GConfig::WINDOW_WIDTH);
-
-                    //frustumClippedPolygons.push_back(clipped[i]);
                 }
-
-                //return frustumClippedPolygons;
             }
         }
 
         void Polygon::_GetClippedPolygon(Polygon** polygons, Polygon** clippedPolygonStash) const
         {
-            //std::vector<Polygon> clippedPolygons;
-            //Polygon* clippedPolygonsStash[16]{}; // max number of clipped polys!
-            Polygon* clippedPolygons[2]{};
+            Polygon *clippedPolygons[2]{};
             int newPolygonCount = 0;
 
             for (int i = 0; i < 2; ++i)
@@ -171,7 +187,8 @@ namespace Granite
                     continue;
                 }
                 
-                clippedPolygonStash[newPolygonCount++] = polygons[i];
+                clippedPolygonStash[newPolygonCount] = polygons[i];
+                ++newPolygonCount;
                 int polyFragments = 1;
 
                 for (int i = 0; i < 4; ++i)
@@ -214,16 +231,9 @@ namespace Granite
                             }
                         }
 
-                        if (polysToAdd == 0)
+                        for (int j = 0; j < polysToAdd; ++j)
                         {
-                            clippedPolygonStash[newPolygonCount++] = testPoly;
-                        }
-                        else
-                        {
-                            for (int j = 0; j < polysToAdd; ++j)
-                            {
-                                clippedPolygonStash[newPolygonCount++] = clippedPolygons[j];
-                            }
+                            clippedPolygonStash[newPolygonCount++] = clippedPolygons[j];
                         }
 
                     }

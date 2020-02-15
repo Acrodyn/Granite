@@ -16,13 +16,14 @@ namespace Granite
         {
         public:
             Polygon();
+            Polygon(const Polygon &other, bool isFragment = false);
             ~Polygon() = default;
 
             void Move(Polygon &&other);
 
             mutable FVector3 vertices[3];
             mutable FVector3 textureCoordinates[3];
-            mutable FVector3 normals[3];
+            //mutable FVector3 normals[3];
 
             void UniformMove(float scalar);
             void UniformScale(float scalar);
@@ -34,6 +35,7 @@ namespace Granite
 
         private:
             mutable float _intensity;
+            bool _fragment;
             Mesh* meshPtr;
             FMatrix4x4 transformation;
 
