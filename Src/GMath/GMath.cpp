@@ -66,9 +66,8 @@ namespace Granite
             return FVector3(1.f, 0.f, 0.f);
         }
 
-        FVector3 VectorIntersectPlane(FVector3 &plane_p, FVector3 &plane_n, FVector3 &lineStart, FVector3 &lineEnd)
+        FVector3 VectorIntersectPlane(const FVector3 &plane_p, const FVector3 &plane_n, FVector3 &lineStart, FVector3 &lineEnd)
         {
-            plane_n.Normalize();
             float plane_d = -(plane_n.DotProduct(plane_p));
             float ad = lineStart.DotProduct(plane_n);
             float bd = lineEnd.DotProduct(plane_n);
@@ -78,21 +77,20 @@ namespace Granite
             return (lineStart + lineToIntersect);
         }
 
-        int ClipAgainstPlane(FVector3 &&plane_p, FVector3 &&plane_n, Polygon &inPoly, Polygon &outPoly1, Polygon &outPoly2)
+        int ClipAgainstPlane(const FVector3 &plane_p, const FVector3 &plane_n, Polygon &inPoly, Polygon **outPolygons)
         {
-            plane_n.Normalize();
+            //plane_n.Normalize();
 
             auto dist = [&](const FVector3& p)
             {
                 return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - plane_n.DotProduct(plane_p));
             };
 
-            FVector3 *insidePoints[3]; 
-            FVector3 *outsidePoints[3];
+            FVector3* insidePoints[3]{};
+            FVector3* outsidePoints[3]{};
 
             int insidePointCount = 0;
             int outsidePointCount = 0;
-
             float d0 = dist(inPoly.vertices[0]);
             float d1 = dist(inPoly.vertices[1]);
             float d2 = dist(inPoly.vertices[2]);
@@ -131,34 +129,37 @@ namespace Granite
 
             if (insidePointCount == 3)
             {
-                outPoly1 = inPoly;
+                outPolygons[0] = &inPoly;
 
                 return 1;
             }
 
             if (insidePointCount == 1 && outsidePointCount == 2)
             {
-                outPoly1.CopyTextureCoordinates(inPoly);
+                //outPoly1.CopyTextureCoordinates(inPoly);
+                outPolygons[0] = new Polygon(inPoly);
 
-                outPoly1.vertices[0] = *insidePoints[0];
-                outPoly1.vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
-                outPoly1.vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);
+                (outPolygons[0])->vertices[0] = *insidePoints[0];
+                (outPolygons[0])->vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
+                (outPolygons[0])->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);
 
                 return 1;
             }
 
             if (insidePointCount == 2 && outsidePointCount == 1)
             {
-                outPoly1.CopyTextureCoordinates(inPoly);
-                outPoly2.CopyTextureCoordinates(inPoly);
+            /*    outPoly1.CopyTextureCoordinates(inPoly);
+                outPoly2.CopyTextureCoordinates(inPoly);*/
+                outPolygons[0] = new Polygon(inPoly);
+                outPolygons[1] = new Polygon(inPoly);
 
-                outPoly1.vertices[0] = *insidePoints[0];
-                outPoly1.vertices[1] = *insidePoints[1];
-                outPoly1.vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
+                (outPolygons[0])->vertices[0] = *insidePoints[0];
+                (outPolygons[0])->vertices[1] = *insidePoints[1];
+                (outPolygons[0])->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
 
-                outPoly2.vertices[0] = *insidePoints[1];
-                outPoly2.vertices[1] = outPoly1.vertices[2];
-                outPoly2.vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[1], *outsidePoints[0]);
+                (outPolygons[1])->vertices[0] = *insidePoints[1];
+                (outPolygons[1])->vertices[1] = (outPolygons[0])->vertices[2];
+                (outPolygons[1])->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[1], *outsidePoints[0]);
 
                 return 2;
             }

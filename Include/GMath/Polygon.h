@@ -18,6 +18,8 @@ namespace Granite
             Polygon();
             ~Polygon() = default;
 
+            void Move(Polygon &&other);
+
             mutable FVector3 vertices[3];
             mutable FVector3 textureCoordinates[3];
             mutable FVector3 normals[3];
@@ -35,9 +37,9 @@ namespace Granite
             Mesh* meshPtr;
             FMatrix4x4 transformation;
 
-            std::vector<Polygon> _GetProjectedPolygons() const;
-            std::vector<Polygon> _GetClippedPolygon(const std::vector<Polygon> &polygonsToClip) const;
-            void _DrawClippedPolygons(std::vector<Polygon> &polygonsToDraw, Color color, const GTexture* texture) const;
+            void _GetProjectedPolygons(Polygon&, Polygon** polygons) const;
+            void _GetClippedPolygon(Polygon** polygons, Polygon** clippedPolygonStash) const;
+            void _DrawClippedPolygons(Polygon** polygonsToDraw, Color color, const GTexture* texture) const;
 
             friend Mesh;
         };

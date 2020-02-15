@@ -10,7 +10,7 @@ namespace Granite
 {
     namespace GMath
     {
-        Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr), worldSpaceTransform(nullptr)
+        Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr), worldSpaceTransform(nullptr), viewSpaceTransform(nullptr)
         {
             ModelLoader::LoadModel(*this, modelPath);
 
