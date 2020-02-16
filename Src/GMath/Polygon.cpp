@@ -30,26 +30,35 @@ namespace Granite
             }
 
             transformation = other.transformation;
-            meshPtr = other.meshPtr;
+            meshPtr = &(*other.meshPtr);
             _intensity = other._intensity;
         }
 
-        void Polygon::RepositionVertices(Uint8 index, const FVector3& newPosition)
+        void Polygon::ChangeData(Uint8 index, const FVector3& newVertices, const FVector3& newTextureCoordinates)
         {
-            /*outPolygons[0]->vertices[0] = *insidePoints[0];
-            outPolygons[0]->vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
-            outPolygons[0]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);*/
+            vertices[index] = newVertices;
+            textureCoordinates[index] = newTextureCoordinates;
+        }
 
-            float changeX = (newPosition.x - vertices[index].x) / vertices[index].x;
-            float changeY = (newPosition.y - vertices[index].y) / vertices[index].y;
-
-            float textChangeX = GUtil::Clamp(textureCoordinates[index].x + textureCoordinates[index].x * changeX, 0.f, 1.f);
-            float textChangeY = GUtil::Clamp(textureCoordinates[index].y + textureCoordinates[index].y * changeY, 0.f, 1.f);
-
-            textureCoordinates[index].x = textChangeX;
-            textureCoordinates[index].y = textChangeY;
-
+        void Polygon::SliceData(Uint8 index, GMath::FVector3* pt0, GMath::FVector3* pt1, GMath::FVector3* tx0, GMath::FVector3* tx1, const FVector3& newPosition)
+        {
             vertices[index] = newPosition;
+
+            const float vertexSliceX = (newPosition.x - pt0->x) / (pt1->x - pt0->x);
+            const float vertexSliceY = (newPosition.y - pt0->y) / (pt1->y - pt0->y);
+
+            float lerpX = GUtil::GInterpolate(tx0->x, tx1->x, vertexSliceX);
+            float lerpY = GUtil::GInterpolate(tx0->y, tx1->y, vertexSliceY);
+
+            if (!isnan(lerpX))
+            {
+                textureCoordinates[index].x = lerpX;
+            }
+            
+            if (!isnan(lerpY))
+            {
+                textureCoordinates[index].y = lerpY;
+            }
         }
 
         void Polygon::Move(Polygon&& other)
@@ -230,20 +239,22 @@ namespace Granite
                             }
                             case 1:
                             {
-                                polysToAdd = ClipAgainstPlane(FVector3(0.f, GConfig::WINDOW_HEIGHT - 1.f, 0.f), GMath::GetUpVector() * -1, *testPoly, clippedPolygons);
+                                polysToAdd = ClipAgainstPlane(FVector3(0.f, GConfig::WINDOW_HEIGHT - 1.f, 0.f), GMath::DownVector, *testPoly, clippedPolygons);
                                 break;
                             }
                             case 2:
                             {
-                                polysToAdd = ClipAgainstPlane(FVector3(0.f, 0.f, 0.f), GMath::GetRightVector(), *testPoly, clippedPolygons);
+                                polysToAdd = ClipAgainstPlane(GMath::ZeroVector, GMath::RightVector, *testPoly, clippedPolygons);
                                 break;
                             }
                             case 3:
                             {
-                                polysToAdd = ClipAgainstPlane(FVector3(GConfig::WINDOW_WIDTH - 1.f, 0.f, 0.f), GMath::GetRightVector() * -1, *testPoly, clippedPolygons);
+                                polysToAdd = ClipAgainstPlane(FVector3(GConfig::WINDOW_WIDTH - 1.f, 0.f, 0.f), GMath::LeftVector, *testPoly, clippedPolygons);
                                 break;
                             }
                         }
+
+                        delete testPoly;
 
                         for (int j = 0; j < polysToAdd; ++j)
                         {

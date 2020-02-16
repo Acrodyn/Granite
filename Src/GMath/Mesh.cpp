@@ -30,7 +30,6 @@ namespace Granite
             }
         }
 
-
         void Mesh::Rasterize()
         {
             const int threadNumber = 8;

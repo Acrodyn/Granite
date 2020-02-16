@@ -25,7 +25,8 @@ namespace Granite
             mutable FVector3 textureCoordinates[3];
             //mutable FVector3 normals[3];
 
-            void RepositionVertices(Uint8 index, const FVector3 &newPosition);
+            void ChangeData(Uint8 index, const FVector3& newVertices, const FVector3& newTextureCoordinates);
+            void SliceData(Uint8 index, GMath::FVector3* pt0, GMath::FVector3* pt1, GMath::FVector3* tx0, GMath::FVector3* tx1, const FVector3& newPosition);
             void UniformMove(float scalar);
             void UniformScale(float scalar);
             void TransformPolygon(const FMatrix4x4& transformMatrix);

@@ -5,6 +5,7 @@ namespace Granite
     namespace GUtil
     {
         const float MAX_FLOAT = 0x0 | 0x7F800000;
+        const float EPSILON = 0.001;
 
         template <typename T>
         T Abs(T number)
@@ -16,6 +17,12 @@ namespace Granite
         T Min(T number1, T number2)
         {
             return (number1 < number2) ? number1 : number2;
+        }
+
+        template <typename T>
+        T Max(T number1, T number2)
+        {
+            return (number1 > number2) ? number1 : number2;
         }
 
         template <typename T>
@@ -50,6 +57,7 @@ namespace Granite
             return value;
         }
 
-        float GInterpolate(float start, float end, float t);
+        inline float GInterpolate(float start, float end, float t) { return start * (1.f - t) + end * t; }
+        inline bool AreFloatsEqual(float a, float b) { return Abs(a - b) < EPSILON; } ;
     }
 }

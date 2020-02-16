@@ -79,17 +79,17 @@ namespace Granite
                 this->z = vector.z;
             }
 
-            float GetLength()
+            float GetLength() const
             {
                 return sqrtf(x * x + y * y + z * z);
             }
 
-            float GetLengthSquared()
+            float GetLengthSquared() const
             {
                 return x * x + y * y + z * z;
             }
 
-            FVector3 ReturnNormalized()
+            FVector3 ReturnNormalized() const
             {
                 FVector3 normalizedVector = *this;
 

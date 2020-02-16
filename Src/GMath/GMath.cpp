@@ -2,6 +2,7 @@
 #include "GMath/FVector3.h"
 #include "GMath/FMatrix4x4.h"
 #include "GMath/Polygon.h"
+#include "GUtils/GUtil.h"
 
 namespace Granite
 {
@@ -84,40 +85,66 @@ namespace Granite
                 return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - plane_n.DotProduct(plane_p));
             };
 
-            FVector3* insidePoints[3]{};
-            FVector3* outsidePoints[3]{};
+            struct PolyData
+            {
+                FVector3* vertices;
+                FVector3* texels;
+            };
+
+            PolyData insidePoints[3]{};
+            PolyData outsidePoints[3]{};
+
+            GMath::FVector3* pv0 = &inPoly.vertices[0];
+            GMath::FVector3* pv1 = &inPoly.vertices[1];
+            GMath::FVector3* pv2 = &inPoly.vertices[2];
+
+            GMath::FVector3* tx0 = &inPoly.textureCoordinates[0];
+            GMath::FVector3* tx1 = &inPoly.textureCoordinates[1];
+            GMath::FVector3* tx2 = &inPoly.textureCoordinates[2];
 
             int insidePointCount = 0;
             int outsidePointCount = 0;
-            float d0 = dist(inPoly.vertices[0]);
-            float d1 = dist(inPoly.vertices[1]);
-            float d2 = dist(inPoly.vertices[2]);
+            float d0 = dist(*pv0);
+            float d1 = dist(*pv1);
+            float d2 = dist(*pv2);
 
             if (d0 >= 0)
             {
-                insidePoints[insidePointCount++] = &inPoly.vertices[0];
+                insidePoints[insidePointCount].vertices = pv0;
+                insidePoints[insidePointCount].texels = tx0;
+                ++insidePointCount;
             }
             else
             {
-                outsidePoints[outsidePointCount++] = &inPoly.vertices[0];
+                outsidePoints[outsidePointCount].vertices = pv0;
+                outsidePoints[outsidePointCount].texels = tx0;
+                ++outsidePointCount;
             }
 
             if (d1 > 0)
             {
-                insidePoints[insidePointCount++] = &inPoly.vertices[1];
+                insidePoints[insidePointCount].vertices = pv1;
+                insidePoints[insidePointCount].texels = tx1;
+                ++insidePointCount;
             }
             else
             {
-                outsidePoints[outsidePointCount++] = &inPoly.vertices[1];
+                outsidePoints[outsidePointCount].vertices = pv1;
+                outsidePoints[outsidePointCount].texels = tx1;
+                ++outsidePointCount;
             }
 
             if (d2 > 0)
             {
-                insidePoints[insidePointCount++] = &inPoly.vertices[2];
+                insidePoints[insidePointCount].vertices = pv2;
+                insidePoints[insidePointCount].texels = tx2;
+                ++insidePointCount;
             }
             else
             {
-                outsidePoints[outsidePointCount++] = &inPoly.vertices[2];
+                outsidePoints[outsidePointCount].vertices = pv2;
+                outsidePoints[outsidePointCount].texels = tx2;
+                ++outsidePointCount;
             }
 
             if (insidePointCount == 0)
@@ -127,7 +154,7 @@ namespace Granite
 
             if (insidePointCount == 3)
             {
-                outPolygons[0] = &inPoly;
+                outPolygons[0] = new Polygon(inPoly, true);
                 
                 return 1;
             }
@@ -135,11 +162,11 @@ namespace Granite
             if (insidePointCount == 1 && outsidePointCount == 2)
             {
                 //outPoly1.CopyTextureCoordinates(inPoly);
-                outPolygons[0] = &inPoly; 
+                outPolygons[0] = new Polygon(inPoly, true);
 
-                outPolygons[0]->RepositionVertices(0, *insidePoints[0]);
-                outPolygons[0]->RepositionVertices(1, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]));
-                outPolygons[0]->RepositionVertices(2, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]));
+                outPolygons[0]->ChangeData(0, *insidePoints[0].vertices, *insidePoints[0].texels);
+                outPolygons[0]->SliceData(1, insidePoints[0].vertices, outsidePoints[0].vertices, insidePoints[0].texels, outsidePoints[0].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0].vertices, *outsidePoints[0].vertices));
+                outPolygons[0]->SliceData(2, insidePoints[0].vertices, outsidePoints[1].vertices, insidePoints[0].texels, outsidePoints[1].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0].vertices, *outsidePoints[1].vertices));
 
                 //outPolygons[0]->vertices[0] = *insidePoints[0];
                 //outPolygons[0]->vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
@@ -152,20 +179,21 @@ namespace Granite
             {
             /*    outPoly1.CopyTextureCoordinates(inPoly);
                 outPoly2.CopyTextureCoordinates(inPoly);*/
-                outPolygons[0] = &inPoly;
+                //outPolygons[0] = &inPoly;
+                outPolygons[0] = new Polygon(inPoly, true);
                 outPolygons[1] = new Polygon(inPoly, true);
 
-                outPolygons[0]->RepositionVertices(0, *insidePoints[0]);
-                outPolygons[0]->RepositionVertices(1, *insidePoints[1]);
-                outPolygons[0]->RepositionVertices(2, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]));
+                outPolygons[0]->ChangeData(0, *insidePoints[0].vertices, *insidePoints[0].texels); // these ones probably don't need reposition
+                outPolygons[0]->ChangeData(1, *insidePoints[1].vertices, *insidePoints[1].texels);
+                outPolygons[0]->SliceData(2, insidePoints[0].vertices, outsidePoints[0].vertices, insidePoints[0].texels, outsidePoints[0].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0].vertices, *outsidePoints[0].vertices));
 
              /*   outPolygons[0]->vertices[0] = *insidePoints[0];
                 outPolygons[0]->vertices[1] = *insidePoints[1];
                 outPolygons[0]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);*/
 
-                outPolygons[1]->RepositionVertices(0, *insidePoints[1]);
-                outPolygons[1]->RepositionVertices(1, outPolygons[0]->vertices[2]);
-                outPolygons[1]->RepositionVertices(2, VectorIntersectPlane(plane_p, plane_n, *insidePoints[1], *outsidePoints[0]));
+                outPolygons[1]->ChangeData(0, *insidePoints[1].vertices, *insidePoints[1].texels);
+                outPolygons[1]->ChangeData(1, outPolygons[0]->vertices[2], outPolygons[0]->textureCoordinates[2]);
+                outPolygons[1]->SliceData(2, insidePoints[1].vertices, outsidePoints[0].vertices, insidePoints[1].texels, outsidePoints[0].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[1].vertices, *outsidePoints[0].vertices));
 
                 /*outPolygons[1]->vertices[0] = *insidePoints[1];
                 outPolygons[1]->vertices[1] = outPolygons[0]->vertices[2];
