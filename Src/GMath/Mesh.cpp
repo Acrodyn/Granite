@@ -32,8 +32,8 @@ namespace Granite
 
         void Mesh::Rasterize()
         {
-            const int threadNumber = 8;
-            int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
+            const int threadNumber = 1;
+            int segmentSize = std::ceil(polygons.size() / threadNumber);
             std::thread threads[threadNumber];
 
             for (int i = 0; i < threadNumber; ++i)
@@ -52,7 +52,7 @@ namespace Granite
         void Mesh::Transform(const Granite::GMath::FMatrix4x4& transformMatrix)
         {
             const int threadNumber = 8;
-            int segmentSize = std::ceil(polygons.size() / threadNumber) + 1;
+            int segmentSize = std::ceil(polygons.size() / threadNumber);
             std::thread threads[threadNumber];
 
             for (int i = 0; i < threadNumber; ++i)
