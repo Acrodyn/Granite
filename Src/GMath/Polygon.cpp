@@ -255,6 +255,7 @@ namespace Granite
                         }
 
                         delete testPoly;
+                        testPoly = nullptr;
 
                         for (int j = 0; j < polysToAdd; ++j)
                         {

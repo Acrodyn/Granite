@@ -161,25 +161,17 @@ namespace Granite
 
             if (insidePointCount == 1 && outsidePointCount == 2)
             {
-                //outPoly1.CopyTextureCoordinates(inPoly);
                 outPolygons[0] = new Polygon(inPoly, true);
 
                 outPolygons[0]->ChangeData(0, *insidePoints[0].vertices, *insidePoints[0].texels);
                 outPolygons[0]->SliceData(1, insidePoints[0].vertices, outsidePoints[0].vertices, insidePoints[0].texels, outsidePoints[0].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0].vertices, *outsidePoints[0].vertices));
                 outPolygons[0]->SliceData(2, insidePoints[0].vertices, outsidePoints[1].vertices, insidePoints[0].texels, outsidePoints[1].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0].vertices, *outsidePoints[1].vertices));
 
-                //outPolygons[0]->vertices[0] = *insidePoints[0];
-                //outPolygons[0]->vertices[1] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);
-                //outPolygons[0]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[1]);
-
                 return 1;
             }
 
             if (insidePointCount == 2 && outsidePointCount == 1)
             {
-            /*    outPoly1.CopyTextureCoordinates(inPoly);
-                outPoly2.CopyTextureCoordinates(inPoly);*/
-                //outPolygons[0] = &inPoly;
                 outPolygons[0] = new Polygon(inPoly, true);
                 outPolygons[1] = new Polygon(inPoly, true);
 
@@ -187,17 +179,9 @@ namespace Granite
                 outPolygons[0]->ChangeData(1, *insidePoints[1].vertices, *insidePoints[1].texels);
                 outPolygons[0]->SliceData(2, insidePoints[0].vertices, outsidePoints[0].vertices, insidePoints[0].texels, outsidePoints[0].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[0].vertices, *outsidePoints[0].vertices));
 
-             /*   outPolygons[0]->vertices[0] = *insidePoints[0];
-                outPolygons[0]->vertices[1] = *insidePoints[1];
-                outPolygons[0]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[0], *outsidePoints[0]);*/
-
                 outPolygons[1]->ChangeData(0, *insidePoints[1].vertices, *insidePoints[1].texels);
                 outPolygons[1]->ChangeData(1, outPolygons[0]->vertices[2], outPolygons[0]->textureCoordinates[2]);
                 outPolygons[1]->SliceData(2, insidePoints[1].vertices, outsidePoints[0].vertices, insidePoints[1].texels, outsidePoints[0].texels, VectorIntersectPlane(plane_p, plane_n, *insidePoints[1].vertices, *outsidePoints[0].vertices));
-
-                /*outPolygons[1]->vertices[0] = *insidePoints[1];
-                outPolygons[1]->vertices[1] = outPolygons[0]->vertices[2];
-                outPolygons[1]->vertices[2] = VectorIntersectPlane(plane_p, plane_n, *insidePoints[1], *outsidePoints[0]);*/
 
                 return 2;
             }
@@ -299,7 +283,6 @@ namespace Granite
             for (int i = 0; i < 3; ++i)
             {
                 polygon.vertices[i] = MultiplyMatrixVector(polygon.vertices[i], matrix);
-                // polygon.normals[i] = MultiplyMatrixVector(polygon.normals[i], matrix);
             }
         }
 
@@ -308,7 +291,6 @@ namespace Granite
             for (int i = 0; i < 3; ++i)
             {
                 oPolygon.vertices[i] = MultiplyMatrixVector(iPolygon.vertices[i], matrix);
-                //oPolygon.normals[i] = MultiplyMatrixVector(iPolygon.normals[i], matrix);
             }
         }
 
@@ -317,7 +299,6 @@ namespace Granite
             for (int i = 0; i < 3; ++i)
             {
                 oTriangle.vertices[i].z = oTriangle.vertices[i].z + offset;
-                //oTriangle.normals[i].z = oTriangle.normals[i].z + offset;
             }
         }
 
