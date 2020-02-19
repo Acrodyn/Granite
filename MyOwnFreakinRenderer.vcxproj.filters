@@ -31,6 +31,12 @@
     <Filter Include="Source Files\GUtils">
       <UniqueIdentifier>{f5b7da15-f576-41b2-adbe-b24faa385c51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GGame">
+      <UniqueIdentifier>{86bbbb7e-5d65-46d7-8f61-771eeff58d13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GGame">
+      <UniqueIdentifier>{10310d11-563b-4451-a212-60231b7cc777}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -56,6 +62,15 @@
     </ClCompile>
     <ClCompile Include="Src\GGraphics\Camera.cpp">
       <Filter>Source Files\GGraphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GGame\GObject.cpp">
+      <Filter>Source Files\GGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GGame\EnemyShip.cpp">
+      <Filter>Source Files\GGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GGame\MainShip.cpp">
+      <Filter>Source Files\GGame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +115,15 @@
     </ClInclude>
     <ClInclude Include="Include\GGraphics\Camera.h">
       <Filter>Header Files\GGraphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GGame\GObject.h">
+      <Filter>Header Files\GGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GGame\EnemyShip.h">
+      <Filter>Header Files\GGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GGame\MainShip.h">
+      <Filter>Header Files\GGame</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

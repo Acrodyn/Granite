@@ -13,12 +13,7 @@ namespace Granite
         Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr), worldSpaceTransform(nullptr), viewSpaceTransform(nullptr)
         {
             ModelLoader::LoadModel(*this, modelPath);
-
-            if (texturePath != "")
-            {
-                meshTexture = new GTexture(texturePath.c_str());
-                Granite::GGraphics::InvertSurfaceVertically(meshTexture->textureData);
-            }
+            SetTexture(texturePath);
         }
 
         Mesh::~Mesh()
@@ -27,6 +22,15 @@ namespace Granite
             {
                 delete meshTexture;
                 meshTexture = nullptr;
+            }
+        }
+
+        void Mesh::SetTexture(std::string texturePath)
+        {
+            if (texturePath != "")
+            {
+                meshTexture = new GTexture(texturePath.c_str());
+                Granite::GGraphics::InvertSurfaceVertically(meshTexture->textureData);
             }
         }
 
@@ -51,7 +55,7 @@ namespace Granite
 
         void Mesh::Transform(const Granite::GMath::FMatrix4x4& transformMatrix)
         {
-            const int threadNumber = 8;
+            const int threadNumber = 1;
             int segmentSize = std::ceil(polygons.size() / threadNumber);
             std::thread threads[threadNumber];
 

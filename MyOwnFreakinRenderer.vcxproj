@@ -160,6 +160,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Src\GGame\EnemyShip.cpp" />
+    <ClCompile Include="Src\GGame\GObject.cpp" />
+    <ClCompile Include="Src\GGame\MainShip.cpp" />
     <ClCompile Include="Src\GGraphics\Camera.cpp" />
     <ClCompile Include="Src\GGraphics\GGraphics.cpp" />
     <ClCompile Include="Src\GMath\FMatrix4x4.cpp" />
@@ -169,6 +172,9 @@
     <ClCompile Include="Src\GUtils\GUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\GGame\EnemyShip.h" />
+    <ClInclude Include="Include\GGame\GObject.h" />
+    <ClInclude Include="Include\GGame\MainShip.h" />
     <ClInclude Include="Include\GGraphics\Camera.h" />
     <ClInclude Include="Include\GGraphics\Colors.h" />
     <ClInclude Include="Include\GGraphics\GGraphics.h" />

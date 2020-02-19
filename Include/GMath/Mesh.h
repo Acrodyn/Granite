@@ -21,6 +21,7 @@ namespace Granite
             Mesh(std::string modelPath, std::string texturePath = "");
             ~Mesh();
 
+            void SetTexture(std::string texturePath);
             void Rasterize();
             void Transform(const Granite::GMath::FMatrix4x4 &transformMatrix);
             void SetWorldSpaceTransform(const FMatrix4x4 &transformMatrix);

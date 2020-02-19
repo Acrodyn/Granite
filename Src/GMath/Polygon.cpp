@@ -161,7 +161,7 @@ namespace Granite
         {
             transformation = transformation * meshPtr->GetWorldSpaceTransform(); // TODO: možda mogu direkt ovo napravit?
             MultiplyMatrixPolygon(transformPolygon, transformation);
-            OffsetPolygonDepth(transformPolygon, 1800.f);
+            OffsetPolygonDepth(transformPolygon, 5.f);
 
             FVector3 normal, line1, line2, cameraToPoint;
 

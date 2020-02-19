@@ -2,6 +2,7 @@
 
 namespace Granite
 {
+	GMath::FMatrix4x4 Camera::matView;
 	Camera* Camera::mainCamera = nullptr;
 
 	Camera::Camera()

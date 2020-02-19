@@ -9,5 +9,7 @@ namespace Granite
 
 		const bool WIREFRAME_MODE = 0;
 		const bool RASTERIZE = 1;
+
+		const bool CAMERA_CONTROLS = 0;
 	}
 }

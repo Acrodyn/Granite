@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GMath/FVector3.h"
+#include "GMath/FMatrix4x4.h"
 
 namespace Granite
 {
@@ -18,6 +19,7 @@ namespace Granite
 		GMath::FVector3 position;
 		GMath::FVector3 forward;
 
+		static GMath::FMatrix4x4 matView;
 	private:
 		static Camera* mainCamera;
 	};
