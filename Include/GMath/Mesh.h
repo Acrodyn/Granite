@@ -30,6 +30,11 @@ namespace Granite
             const FMatrix4x4& GetViewSpaceTransform() const;
             void OffsetMesh(float offset);
 
+            float MeshDepth;
+            float MeshScale;
+            float MeshInitialPosOffset;
+            FMatrix4x4 *Transformation;
+
         private:
             void _AddPolygon(const FVector3* vertices);
             void _AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals);
@@ -40,6 +45,7 @@ namespace Granite
             GTexture *meshTexture;
             const FMatrix4x4 *worldSpaceTransform;
             const FMatrix4x4* viewSpaceTransform;
+            
 
             friend ModelLoader;
         };

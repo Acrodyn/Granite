@@ -1,4 +1,5 @@
 #include "GMath/FMatrix4x4.h"
+#include <cmath>
 
 namespace Granite
 {
@@ -54,6 +55,13 @@ namespace Granite
             }
 
             return newMatrix;
+        }
+
+        void FMatrix4x4::GetRotation(float& Yaw, float& Pitch, float& Roll) const
+        {
+            Yaw = atan2(-data[2][0], sqrt(pow(data[2][1], 2) + pow(data[2][2], 2)));
+            Pitch = atan2(data[2][1], data[2][2]);
+            Roll = atan2(data[1][0], data[0][0]);
         }
     }
 }

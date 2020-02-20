@@ -30,6 +30,7 @@ namespace Granite
             void UniformMove(float scalar);
             void UniformScale(float scalar);
             void TransformPolygon(const FMatrix4x4& transformMatrix);
+            void OffsetPolygonDepth(float offset);
             void CopyTextureCoordinates(const Polygon &other);
             void RasterizePolygon(Color color) const;
             void RasterizePolygon(const GTexture* texture) const;

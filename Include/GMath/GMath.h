@@ -31,7 +31,8 @@ namespace Granite
         void MultiplyMatrixPolygon(Polygon& polygon, const FMatrix4x4& matrix);
         void MultiplyMatrixPolygon(const Polygon& iPolygon, Polygon& oPolygon, const FMatrix4x4& matrix);
         void OffsetPolygonDepth(Polygon& oTriangle, float offset);
-        float AnglesToRadians(float angles);
+        float DegreesToRadians(float angles);
+        float RadiansToDegrees(float radians);
 
         const float PI = 3.1415926535898f;
 

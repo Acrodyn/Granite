@@ -9,5 +9,9 @@ public:
 	~MainShip() = default;
 
 	virtual void Update(float deltaTime, const Uint8* state) override;
+protected:
+	void SetupView() override;
+
 private:
+	float _moveSpeed;
 };

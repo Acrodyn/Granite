@@ -9,5 +9,6 @@ public:
 	~EnemyShip() = default;
 
 	virtual void Update(float deltaTime, const Uint8* state) override;
-private:
+protected:
+	void SetupView() override;
 };

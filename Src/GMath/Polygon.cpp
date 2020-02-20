@@ -16,7 +16,7 @@ namespace Granite
     {
         Polygon::Polygon() : meshPtr(nullptr), _fragment(false), _intensity(0.f)
         {
-            transformation.MakeIdentity();
+
         }
 
         Polygon::Polygon(const Polygon& other, bool isFragment)
@@ -29,7 +29,6 @@ namespace Granite
                 textureCoordinates[i] = other.textureCoordinates[i];
             }
 
-            transformation = other.transformation;
             meshPtr = &(*other.meshPtr);
             _intensity = other._intensity;
         }
@@ -72,7 +71,6 @@ namespace Granite
 
             _intensity = other._intensity;
             meshPtr = other.meshPtr;
-            transformation = other.transformation;
         }
 
         void Polygon::UniformMove(float scalar)
@@ -108,6 +106,14 @@ namespace Granite
         void Polygon::TransformPolygon(const FMatrix4x4& transformMatrix)
         {
             MultiplyMatrixPolygon(const_cast<Polygon&>(*this), transformMatrix);
+        }
+
+        void Polygon::OffsetPolygonDepth(float offset)
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                vertices[i].z = vertices[i].z + offset;
+            }
         }
 
         void Polygon::CopyTextureCoordinates(const Polygon& other)
@@ -159,9 +165,8 @@ namespace Granite
 
         void Polygon::_GetProjectedPolygons(Polygon &transformPolygon, Polygon** polygons) const
         {
-            transformation = transformation * meshPtr->GetWorldSpaceTransform(); // TODO: možda mogu direkt ovo napravit?
-            MultiplyMatrixPolygon(transformPolygon, transformation);
-            OffsetPolygonDepth(transformPolygon, 5.f);
+            MultiplyMatrixPolygon(transformPolygon, *meshPtr->Transformation);
+            GMath::OffsetPolygonDepth(transformPolygon, meshPtr->MeshDepth);
 
             FVector3 normal, line1, line2, cameraToPoint;
 
@@ -192,8 +197,8 @@ namespace Granite
                     // Project triangles from 3D --> 2D
                     MultiplyMatrixPolygon(*polygons[i], GMath::GetProjectionMatrix());
 
-                    polygons[i]->UniformMove(1.0f);
-                    polygons[i]->UniformScale(0.5f * (float)GConfig::WINDOW_WIDTH);
+                    polygons[i]->UniformMove(meshPtr->MeshInitialPosOffset);
+                    polygons[i]->UniformScale(meshPtr->MeshScale * (float)GConfig::WINDOW_WIDTH);
                 }
             }
         }

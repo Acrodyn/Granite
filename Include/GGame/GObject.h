@@ -28,5 +28,7 @@ public:
     mesh.Transform(Granite::GMath::GetYRotation(Granite::GMath::AnglesToRadians(180.f)));*/
 
 protected:
+    virtual void SetupView() = 0;
+
     Granite::GMath::Mesh mesh;
 };

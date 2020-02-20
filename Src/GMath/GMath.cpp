@@ -48,7 +48,6 @@ namespace Granite
             rotation.data[1][1] = cosf(angle);
             rotation.data[2][2] = 1;
             rotation.data[3][3] = 1;
-
             return rotation;
         }
 
@@ -230,7 +229,7 @@ namespace Granite
 
             float near = 0.1f;
             float far = 1000.0f;
-            float fFovRad = GMath::AnglesToRadians(90.f);
+            float fFovRad = GMath::DegreesToRadians(90.f);
 
             float scale = 1 / tan(90.f * 0.5 * M_PI / 180); // alternative
 
@@ -302,9 +301,14 @@ namespace Granite
             }
         }
 
-        float AnglesToRadians(float angles)
+        float DegreesToRadians(float angles)
         {
             return angles * PI / 180.f;
+        }
+
+        float RadiansToDegrees(float radians)
+        {
+            return radians * 180.f / PI;
         }
 	}
 }

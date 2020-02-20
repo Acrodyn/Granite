@@ -18,7 +18,6 @@
 int main(int argc, char* argv[])
 {
     Granite::GGraphics::InitGraphics();
-
     SDL_Event e;
 
     float milisecondsPassed = 0;
@@ -31,6 +30,7 @@ int main(int argc, char* argv[])
     float cameraSpeed = 850.f;
     float fYaw = 0.f;
 
+    // TODO: Vj zelimo ucitat prototipe za odredjeni level i onda radit kopije od njih, ovo bi bilo preskupo
     MainShip ship("Great Fox.obj", "greatFox.png");
     EnemyShip ship2("Great Fox.obj", "greatFox.png");
 
@@ -56,10 +56,6 @@ int main(int argc, char* argv[])
 
         Granite::GGraphics::ClearScreen(Granite::Color::Black);
         Granite::GGraphics::ClearDepthBuffer();
-
-        //Granite::GMath::FMatrix4x4 transformMatrix;
-        //transformMatrix.MakeIdentity();
-        //transformMatrix = Granite::GMath::GetTranslationMatrix(0.f, 0.f, 5.f); // ovo moze komotno bit u samoj matrici!
 
         Granite::GMath::FMatrix4x4 matWorld;
         matWorld.MakeIdentity();

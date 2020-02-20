@@ -14,6 +14,9 @@ namespace Granite
         {
             ModelLoader::LoadModel(*this, modelPath);
             SetTexture(texturePath);
+
+            Transformation = new FMatrix4x4();
+            Transformation->MakeIdentity();
         }
 
         Mesh::~Mesh()
@@ -23,6 +26,8 @@ namespace Granite
                 delete meshTexture;
                 meshTexture = nullptr;
             }
+
+            delete Transformation;
         }
 
         void Mesh::SetTexture(std::string texturePath)
@@ -36,6 +41,8 @@ namespace Granite
 
         void Mesh::Rasterize()
         {
+            *Transformation = *Transformation * GetWorldSpaceTransform(); // TODO: možda mogu direkt ovo napravit?
+
             const int threadNumber = 1;
             int segmentSize = std::ceil(polygons.size() / threadNumber);
             std::thread threads[threadNumber];
@@ -94,7 +101,7 @@ namespace Granite
         {
             for (auto& poly : polygons)
             {
-                GMath::OffsetPolygonDepth(poly, offset);
+                poly.OffsetPolygonDepth(offset);
             }
         }
 
