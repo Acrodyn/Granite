@@ -1,7 +1,10 @@
 #include "GGame/MainShip.h"
 #include "GMath/GMath.h"
 
-MainShip::MainShip(std::string model, std::string texture) : GObject(model, texture), _moveSpeed(3.f)
+MainShip::MainShip(std::string model, std::string texture) : GObject(model, texture), 
+        _moveSpeed(3.f), 
+        _yawCap(25.f), 
+        _pitchCap(25.f)
 {
     this->SetupView();
 }
@@ -17,36 +20,46 @@ void MainShip::Update(float deltaTime, const Uint8* state)
     Pitch = Granite::GMath::RadiansToDegrees(Pitch);
     Roll = Granite::GMath::RadiansToDegrees(Roll);
 
-    std::printf("%f %f %f \n", Yaw, Pitch, Roll);
-
     if (state[SDL_SCANCODE_W])
     {
-        matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * _moveSpeed);
+        if (Pitch >= -_pitchCap)
+        {
+            matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * _moveSpeed);
+        }
     }
 
     if (state[SDL_SCANCODE_S])
     {
-        matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * -_moveSpeed);
+        if (Pitch <= _pitchCap)
+        {
+            matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * -_moveSpeed);
+        }
     }
 
     if (state[SDL_SCANCODE_A])
     {
-        matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * _moveSpeed);
+        if (Yaw <= _yawCap)
+        {
+            matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * _moveSpeed);
+        }
     }
 
     if (state[SDL_SCANCODE_D])
     {
-        matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * -_moveSpeed);
+        if (Yaw >= -_yawCap)
+        {
+            matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * -_moveSpeed);
+        }
     }
 
     if (state[SDL_SCANCODE_Q])
     {
-        matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * -_moveSpeed);
+        matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * -_moveSpeed * 1.5f);
     }
 
     if (state[SDL_SCANCODE_E])
     {
-        matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * _moveSpeed);
+        matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * _moveSpeed * 1.5f);
     }
 
     mesh.SetWorldSpaceTransform(matWorld);

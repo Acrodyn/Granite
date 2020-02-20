@@ -14,4 +14,7 @@ protected:
 
 private:
 	float _moveSpeed;
+
+	float _yawCap;
+	float _pitchCap;
 };
