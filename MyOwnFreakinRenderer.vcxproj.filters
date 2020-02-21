@@ -72,6 +72,9 @@
     <ClCompile Include="Src\GGame\MainShip.cpp">
       <Filter>Source Files\GGame</Filter>
     </ClCompile>
+    <ClCompile Include="Src\GUtils\KeyHandler.cpp">
+      <Filter>Source Files\GUtils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\GGraphics\GGraphics.h">
@@ -124,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="Include\GGame\MainShip.h">
       <Filter>Header Files\GGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GUtils\KeyHandler.h">
+      <Filter>Header Files\GUtils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

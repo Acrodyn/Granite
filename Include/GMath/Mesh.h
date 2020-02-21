@@ -32,12 +32,15 @@ namespace Granite
 
             float MeshDepth;
             float MeshScale;
+            float MeshPosX;
+            float MeshPosY;
+            float MeshPosZ;
             float MeshInitialPosOffset;
             FMatrix4x4 *Transformation;
 
         private:
             void _AddPolygon(const FVector3* vertices);
-            void _AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals);
+            void _AddPolygon(const FVector3* vertices, const FVector3* textureCoords);
             void _RasterizePolygonThread(int startingPolygonIndex, int endingPolygonIndex);
             void _TransformPolygonThread(int startingPolygonIndex, int endingPolygonIndex, const Granite::GMath::FMatrix4x4& transformMatrix);
 

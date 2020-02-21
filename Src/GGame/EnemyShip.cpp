@@ -5,7 +5,7 @@ EnemyShip::EnemyShip(std::string model, std::string texture) : GObject(model, te
     this->SetupView();
 }
 
-void EnemyShip::Update(float deltaTime, const Uint8* state)
+void EnemyShip::Update(float deltaTime)
 {
     Granite::GMath::FMatrix4x4 matWorld;
     matWorld.MakeIdentity();

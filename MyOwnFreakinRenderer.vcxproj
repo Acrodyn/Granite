@@ -170,6 +170,7 @@
     <ClCompile Include="Src\GMath\Mesh.cpp" />
     <ClCompile Include="Src\GMath\Polygon.cpp" />
     <ClCompile Include="Src\GUtils\GUtil.cpp" />
+    <ClCompile Include="Src\GUtils\KeyHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\GGame\EnemyShip.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Include\GMath\Triangle.h" />
     <ClInclude Include="Include\GUtils\GConfig.h" />
     <ClInclude Include="Include\GUtils\GUtil.h" />
+    <ClInclude Include="Include\GUtils\KeyHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODO.txt" />

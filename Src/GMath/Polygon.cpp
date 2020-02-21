@@ -88,6 +88,51 @@ namespace Granite
             vertices[2].z += scalar;
         }
 
+        void Polygon::MoveX(float scalar)
+        {
+        /*    if (GUtil::AreFloatsEqual(scalar, meshPtr->MeshPosX))
+            {
+                return;
+            }*/
+
+            for (int i = 0; i < 3; ++i)
+            {
+                vertices[i].x += scalar;
+            }
+
+            //printf("Moving X\n");
+        }
+
+        void Polygon::MoveY(float scalar)
+        {
+          /*  if (GUtil::AreFloatsEqual(scalar, meshPtr->MeshPosY))
+            {
+                return;
+            }*/
+
+            for (int i = 0; i < 3; ++i)
+            {
+                vertices[i].y += scalar;
+            }
+
+            //printf("Moving y\n");
+        }
+
+        void Polygon::MoveZ(float scalar)
+        {
+           /* if (GUtil::AreFloatsEqual(scalar, meshPtr->MeshPosZ))
+            {
+                return;
+            }*/
+
+            for (int i = 0; i < 3; ++i)
+            {
+                vertices[i].z += scalar;
+            }
+
+            //printf("Moving z\n");
+        }
+
         void Polygon::UniformScale(float scalar)
         {
             vertices[0].x *= scalar;
@@ -199,6 +244,9 @@ namespace Granite
 
                     polygons[i]->UniformMove(meshPtr->MeshInitialPosOffset);
                     polygons[i]->UniformScale(meshPtr->MeshScale * (float)GConfig::WINDOW_WIDTH);
+                    polygons[i]->MoveX(meshPtr->MeshPosX);
+                    polygons[i]->MoveY(meshPtr->MeshPosY);
+                    polygons[i]->MoveZ(meshPtr->MeshPosZ);
                 }
             }
         }

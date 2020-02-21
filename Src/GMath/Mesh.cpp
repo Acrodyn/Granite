@@ -144,7 +144,7 @@ namespace Granite
             polygons.push_back(newPolygon);
         }
 
-        void Mesh::_AddPolygon(const FVector3* vertices, const FVector3* textureCoords, const FVector3* normals)
+        void Mesh::_AddPolygon(const FVector3* vertices, const FVector3* textureCoords)
         {
             Polygon newPolygon;
 
@@ -152,7 +152,6 @@ namespace Granite
             {
                 newPolygon.vertices[i] = vertices[i];
                 newPolygon.textureCoordinates[i] = textureCoords[i];
-                //newPolygon.normals[i] = normals[i];
             }
 
             newPolygon.meshPtr = &(*this);

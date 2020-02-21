@@ -145,14 +145,14 @@ namespace Granite
 				{
 					vertexIndicesArr[ai] = vertexIndices[vi];
 					textureIndicesArr[ai] = textureIndices[vi];
-					normalIndicesArr[ai] = normalIndices[vi];
+					//normalIndicesArr[ai] = normalIndices[vi];
 				}
 
 				vertexIndicesArr[0] = vertexIndices[0];
 				textureIndicesArr[0] = textureIndices[0];
-				normalIndicesArr[0] = normalIndices[0];
+				//normalIndicesArr[0] = normalIndices[0];
 
-				mesh._AddPolygon(vertexIndicesArr, textureIndicesArr, normalIndicesArr);
+				mesh._AddPolygon(vertexIndicesArr, textureIndicesArr);
 
 				--dataCountIndex;;
 			}

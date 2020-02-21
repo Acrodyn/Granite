@@ -8,7 +8,7 @@ public:
 	EnemyShip(std::string model, std::string texture = "");
 	~EnemyShip() = default;
 
-	virtual void Update(float deltaTime, const Uint8* state) override;
+	virtual void Update(float deltaTime) override;
 protected:
 	void SetupView() override;
 };
