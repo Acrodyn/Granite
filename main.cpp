@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
             SDL_Delay(milisecondsPerFrame - milisecondsPassed);
         }
 
-        printf("FPS is: %f \n", 1000.f / milisecondsPassed);
+       //printf("FPS is: %f \n", 1000.f / milisecondsPassed);
 
         Granite::GGraphics::ClearScreen(Granite::Color::Black);
         Granite::GGraphics::ClearDepthBuffer();

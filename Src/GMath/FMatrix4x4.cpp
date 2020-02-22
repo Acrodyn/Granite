@@ -1,4 +1,5 @@
 #include "GMath/FMatrix4x4.h"
+#include "GUtils/GUtil.h"
 #include <cmath>
 
 namespace Granite
@@ -62,6 +63,32 @@ namespace Granite
             Yaw = atan2(-data[2][0], sqrt(pow(data[2][1], 2) + pow(data[2][2], 2)));
             Pitch = atan2(data[2][1], data[2][2]);
             Roll = atan2(data[1][0], data[0][0]);
+        }
+
+        bool FMatrix4x4::IsIdentity() const
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    if (i == j)
+                    {
+                        if (!GUtil::AreFloatsEqual(data[i][j], 1.f))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (!GUtil::AreFloatsEqual(data[i][j], 0.f))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }
