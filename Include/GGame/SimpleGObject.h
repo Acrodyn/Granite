@@ -2,11 +2,11 @@
 
 #include "GGame/GObject.h"
 
-class EnemyShip : public GObject
+class SimpleGObject : public GObject
 {
 public:
-	EnemyShip(std::string model, std::string texture = "");
-	~EnemyShip() = default;
+	SimpleGObject(std::string model, std::string texture = "");
+	~SimpleGObject() = default;
 
 	virtual void Update(float deltaTime) override;
 protected:

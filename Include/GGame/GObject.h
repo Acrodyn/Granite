@@ -23,8 +23,7 @@ public:
 
     virtual void Update(float deltaTime) = 0;
 
-    /*Granite::GMath::Mesh mesh("Great Fox.obj", "greatFox.png");
-    mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
+    /*mesh.Transform(Granite::GMath::GetXRotation(Granite::GMath::AnglesToRadians(180.f)));
     mesh.Transform(Granite::GMath::GetYRotation(Granite::GMath::AnglesToRadians(180.f)));*/
 
 protected:

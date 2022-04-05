@@ -1,11 +1,11 @@
-#include "GGame/EnemyShip.h"
+#include "GGame/SimpleGObject.h"
 
-EnemyShip::EnemyShip(std::string model, std::string texture) : GObject(model, texture)
+SimpleGObject::SimpleGObject(std::string model, std::string texture) : GObject(model, texture)
 {
     this->SetupView();
 }
 
-void EnemyShip::Update(float deltaTime)
+void SimpleGObject::Update(float deltaTime)
 {
     Granite::GMath::FMatrix4x4 matWorld;
     matWorld.MakeIdentity();
@@ -15,7 +15,7 @@ void EnemyShip::Update(float deltaTime)
     mesh.Rasterize();
 }
 
-void EnemyShip::SetupView()
+void SimpleGObject::SetupView()
 {
     mesh.MeshDepth = 25.f;
     mesh.MeshScale = 0.2f;

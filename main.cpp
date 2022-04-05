@@ -13,8 +13,7 @@
 #include "GMath/FVector3.h"
 #include "GMath/Polygon.h"
 #include "GGraphics/Colors.h"
-#include "GGame/MainShip.h"
-#include "GGame/EnemyShip.h"
+#include "GGame/SimpleGObject.h"
 
 int main(int argc, char* argv[])
 {
@@ -31,12 +30,10 @@ int main(int argc, char* argv[])
     float cameraSpeed = 850.f;
     float fYaw = 0.f;
 
-    // TODO: Vj zelimo ucitat prototipe za odredjeni level i onda radit kopije od njih, ovo bi bilo preskupo
-    MainShip ship("Great Fox.obj", "greatFox.png");
-    //EnemyShip ship2("Great Fox.obj", "greatFox.png");
-
     Granite::Camera camera;
     Granite::Camera::SetMainCamera(camera);
+
+    SimpleGObject cottage("Cat/Cat.obj", "Cat/Cat_diffuse.jpg");
 
     while (true)
     {
@@ -56,72 +53,71 @@ int main(int argc, char* argv[])
         Granite::GGraphics::ClearScreen(Granite::Color::Black);
         Granite::GGraphics::ClearDepthBuffer();
 
-
         Granite::GMath::FVector3 vForward = Granite::Camera::GetMainCamera()->forward * (cameraSpeed * deltaTime);
 
         while (SDL_PollEvent(&e))
         {
-            //if (e.type == SDL_KEYDOWN)
-            //{
-               // if (Granite::GConfig::CAMERA_CONTROLS)
-               // {
-                //    if (e.key.keysym.sym == SDLK_1)
-                //    {
-                //        matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * 5.5f);
-                //    }
+            if (e.type == SDL_KEYDOWN)
+            {
+                if (Granite::GConfig::CAMERA_CONTROLS)
+                {
+                    //if (e.key.keysym.sym == SDLK_1)
+                    //{
+                    //    matWorld = matWorld * Granite::GMath::GetXRotation(deltaTime * 5.5f);
+                    //}
 
-                //    if (e.key.keysym.sym == SDLK_2)
-                //    {
-                //        matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * 5.3f);
-                //    }
+                    //if (e.key.keysym.sym == SDLK_2)
+                    //{
+                    //    matWorld = matWorld * Granite::GMath::GetYRotation(deltaTime * 5.3f);
+                    //}
 
-                //    if (e.key.keysym.sym == SDLK_3)
-                //    {
-                //        matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * 5.4f);
-                //    }
+                    //if (e.key.keysym.sym == SDLK_3)
+                    //{
+                    //    matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * 5.4f);
+                    //}
 
-                //    if (e.key.keysym.sym == SDLK_UP)
-                //    {
-                //        Granite::Camera::GetMainCamera()->position.y -= cameraSpeed * deltaTime;
-                //    }
+                    if (e.key.keysym.sym == SDLK_UP)
+                    {
+                        Granite::Camera::GetMainCamera()->position.y -= cameraSpeed * deltaTime;
+                    }
 
-                //    if (e.key.keysym.sym == SDLK_DOWN)
-                //    {
-                //        Granite::Camera::GetMainCamera()->position.y += cameraSpeed * deltaTime;
-                //    }
+                    if (e.key.keysym.sym == SDLK_DOWN)
+                    {
+                        Granite::Camera::GetMainCamera()->position.y += cameraSpeed * deltaTime;
+                    }
 
-                //    // ovo ne radi dobro zbog pukog x-a
-                //    if (e.key.keysym.sym == SDLK_LEFT)
-                //    {
-                //        Granite::Camera::GetMainCamera()->position.x -= cameraSpeed * deltaTime;
-                //    }
+                    // ovo ne radi dobro zbog pukog x-a
+                    if (e.key.keysym.sym == SDLK_LEFT)
+                    {
+                        Granite::Camera::GetMainCamera()->position.x -= cameraSpeed * deltaTime;
+                    }
 
-                //    if (e.key.keysym.sym == SDLK_RIGHT)
-                //    {
-                //        Granite::Camera::GetMainCamera()->position.x += cameraSpeed * deltaTime;
-                //    }
+                    if (e.key.keysym.sym == SDLK_RIGHT)
+                    {
+                        Granite::Camera::GetMainCamera()->position.x += cameraSpeed * deltaTime;
+                    }
 
-                //    if (e.key.keysym.sym == SDLK_a)
-                //    {
-                //        fYaw += 3.f * deltaTime;
-                //    }
+                    if (e.key.keysym.sym == SDLK_a)
+                    {
+                        fYaw += 3.f * deltaTime;
+                    }
 
-                //    if (e.key.keysym.sym == SDLK_d)
-                //    {
-                //        fYaw -= 3.f * deltaTime;
-                //    }
+                    if (e.key.keysym.sym == SDLK_d)
+                    {
+                        fYaw -= 3.f * deltaTime;
+                    }
 
-                //    if (e.key.keysym.sym == SDLK_w)
-                //    {
-                //        Granite::Camera::GetMainCamera()->position += vForward;
-                //    }
+                    if (e.key.keysym.sym == SDLK_w)
+                    {
+                        Granite::Camera::GetMainCamera()->position += vForward;
+                    }
 
-                //    if (e.key.keysym.sym == SDLK_s)
-                //    {
-                //        Granite::Camera::GetMainCamera()->position -= vForward;
-                //    }
-                //}
-            //}
+                    if (e.key.keysym.sym == SDLK_s)
+                    {
+                        Granite::Camera::GetMainCamera()->position -= vForward;
+                    }
+                }
+            }
         }
 
         if (e.type == SDL_QUIT)
@@ -134,8 +130,7 @@ int main(int argc, char* argv[])
         Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, Granite::Camera::GetMainCamera()->GetTarget(), Granite::GMath::GetUpVector());
         Granite::Camera::matView = Granite::GMath::GetInverseMatrix(matCamera);
 
-        ship.Update(deltaTime);
-       // ship2.Update(deltaTime, state);
+        cottage.Update(deltaTime);
         Granite::GGraphics::UpdateScreen();
     }
 

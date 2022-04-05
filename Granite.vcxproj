@@ -110,7 +110,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\Libs\SDL2\include;$(SolutionDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\include;$(SolutionDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,7 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Src\GGame\EnemyShip.cpp" />
+    <ClCompile Include="Src\GGame\SimpleGObject.cpp" />
     <ClCompile Include="Src\GGame\GObject.cpp" />
     <ClCompile Include="Src\GGame\MainShip.cpp" />
     <ClCompile Include="Src\GGraphics\Camera.cpp" />
@@ -176,7 +177,7 @@
     <ClCompile Include="Src\GUtils\KeyHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\GGame\EnemyShip.h" />
+    <ClInclude Include="Include\GGame\SimpleGObject.h" />
     <ClInclude Include="Include\GGame\GObject.h" />
     <ClInclude Include="Include\GGame\MainShip.h" />
     <ClInclude Include="Include\GGraphics\Camera.h" />

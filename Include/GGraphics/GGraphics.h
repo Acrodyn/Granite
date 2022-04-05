@@ -131,12 +131,12 @@ namespace Granite
         static void RasterizeTriangle(const GMath::Polygon& polygon, Uint32 color);
         static void RasterizeTriangle(const GMath::Polygon& polygon, const GTexture* texture = nullptr);
 
-        static enum Color GetRandomColor()
-        {
-            static std::vector<Color> colorPool = { Color::Red, Color::Green, Color::Blue, Color::White};
-            std::random_shuffle(colorPool.begin(), colorPool.end());
-            return colorPool.at(0);
-        }
+        //static enum Color GetRandomColor()
+        //{
+        //    static std::vector<Color> colorPool = { Color::Red, Color::Green, Color::Blue, Color::White};
+        //    std::shuffle(colorPool.begin(), colorPool.end());
+        //    return colorPool.at(0);
+        //}
 
         static Color GetGeneratedColor(unsigned int color)
         {

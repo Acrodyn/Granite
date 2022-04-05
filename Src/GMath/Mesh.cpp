@@ -12,7 +12,7 @@ namespace Granite
     {
         Mesh::Mesh(std::string modelPath, std::string texturePath) : meshTexture(nullptr), worldSpaceTransform(nullptr), viewSpaceTransform(nullptr)
         {
-            ModelLoader::LoadModel(*this, modelPath);
+            ModelLoader::LoadModel(*this, "/Assets/" + modelPath);
             SetTexture(texturePath);
 
             Transformation = new FMatrix4x4();
@@ -34,7 +34,10 @@ namespace Granite
         {
             if (texturePath != "")
             {
-                meshTexture = new GTexture(texturePath.c_str());
+                std::filesystem::path currentPath = std::filesystem::current_path();
+                std::string fullPath = currentPath.generic_string() + "/Assets/" + texturePath;
+
+                meshTexture = new GTexture(fullPath.c_str());
                 Granite::GGraphics::InvertSurfaceVertically(meshTexture->textureData);
             }
         }

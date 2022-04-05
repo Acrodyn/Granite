@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <algorithm>
 #include <string>
 #include <sstream>
@@ -17,7 +18,9 @@ namespace Granite
 	public:
 		static void LoadModel(GMath::Mesh& mesh, std::string modelPath)
 		{
-			std::ifstream file(modelPath);
+			std::filesystem::path currentPath = std::filesystem::current_path();
+			std::string fullPath = currentPath.generic_string() + modelPath;
+			std::ifstream file(fullPath, std::ios::in);
 
 			std::vector<GMath::FVector3> vertices = {};
 			std::vector<GMath::FVector3> textureCoords = {};
