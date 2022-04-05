@@ -46,7 +46,7 @@ namespace Granite
         {
             *Transformation = *Transformation * GetWorldSpaceTransform(); // TODO: možda mogu direkt ovo napravit?
 
-            const int threadNumber = 1;
+            const int threadNumber = 3;
             int segmentSize = std::ceil(polygons.size() / threadNumber);
             std::thread threads[threadNumber];
 

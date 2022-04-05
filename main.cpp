@@ -33,8 +33,8 @@ int main(int argc, char* argv[])
     Granite::Camera camera;
     Granite::Camera::SetMainCamera(camera);
 
-    SimpleGObject cottage("Cat/Cat.obj", "Cat/Cat_diffuse.jpg");
-    cottage.SetRotationSpeed(1.f);
+    SimpleGObject cat("Cat/Cat.obj", "Cat/Cat_diffuse.jpg");
+    cat.SetRotationSpeed(1.f);
 
     while (true)
     {
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
         Granite::GMath::FMatrix4x4 matCamera = Granite::GMath::GetPointAtMatrix(Granite::Camera::GetMainCamera()->position, Granite::Camera::GetMainCamera()->GetTarget(), Granite::GMath::GetUpVector());
         Granite::Camera::matView = Granite::GMath::GetInverseMatrix(matCamera);
 
-        cottage.Update(deltaTime);
+        cat.Update(deltaTime);
         Granite::GGraphics::UpdateScreen();
     }
 
