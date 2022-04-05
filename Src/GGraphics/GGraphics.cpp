@@ -2,7 +2,7 @@
 #include "GUtils/GUtil.h"
 #include "GMath/Polygon.h"
 #include "GMath/IPoint.h"
-#include "SDL_image.h"
+#include "SDL2/SDL_image.h"
 
 #define SDL_LOCKIFMUST(s) (SDL_MUSTLOCK(s) ? SDL_LockSurface(s) : 0)
 #define SDL_UNLOCKIFMUST(s) { if(SDL_MUSTLOCK(s)) SDL_UnlockSurface(s); }
@@ -19,7 +19,7 @@ namespace Granite
 
         if (!initiated)
         {
-            window = SDL_CreateWindow("An Asian girl renderer! mmmmm....", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Granite::GConfig::WINDOW_WIDTH, Granite::GConfig::WINDOW_HEIGHT, 0);
+            window = SDL_CreateWindow("Granite", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Granite::GConfig::WINDOW_WIDTH, Granite::GConfig::WINDOW_HEIGHT, 0);
 
             if (window == NULL) {
                 throw "Window can't be created!";

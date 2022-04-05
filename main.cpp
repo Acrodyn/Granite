@@ -1,4 +1,4 @@
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "GMath/GMath.h"
 #include "GUtils/GUtil.h"
 #include "GUtils/GConfig.h"

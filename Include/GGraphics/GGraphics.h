@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "GGraphics/Colors.h"
 #include "GMath/GMath.h"
 #include "GUtils/GConfig.h"
