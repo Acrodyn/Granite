@@ -27,13 +27,14 @@ int main(int argc, char* argv[])
     float milisecondsPerFrame = 16.f;
     float fps = 0;
 
-    float cameraSpeed = 850.f;
+    float cameraSpeed = 1.0f;
     float fYaw = 0.f;
 
     Granite::Camera camera;
     Granite::Camera::SetMainCamera(camera);
 
     SimpleGObject cottage("Cat/Cat.obj", "Cat/Cat_diffuse.jpg");
+    cottage.SetRotationSpeed(1.f);
 
     while (true)
     {
@@ -48,12 +49,13 @@ int main(int argc, char* argv[])
             SDL_Delay(milisecondsPerFrame - milisecondsPassed);
         }
 
-       //printf("FPS is: %f \n", 1000.f / milisecondsPassed);
+       printf("FPS is: %f \n", 1000.f / milisecondsPassed);
 
         Granite::GGraphics::ClearScreen(Granite::Color::Black);
         Granite::GGraphics::ClearDepthBuffer();
 
         Granite::GMath::FVector3 vForward = Granite::Camera::GetMainCamera()->forward * (cameraSpeed * deltaTime);
+
 
         while (SDL_PollEvent(&e))
         {
@@ -76,46 +78,46 @@ int main(int argc, char* argv[])
                     //    matWorld = matWorld * Granite::GMath::GetZRotation(deltaTime * 5.4f);
                     //}
 
-                    if (e.key.keysym.sym == SDLK_UP)
-                    {
-                        Granite::Camera::GetMainCamera()->position.y -= cameraSpeed * deltaTime;
-                    }
+                    //if (e.key.keysym.sym == SDLK_UP)
+                    //{
+                    //    Granite::Camera::GetMainCamera()->position.y -= cameraSpeed * deltaTime;
+                    //}
 
-                    if (e.key.keysym.sym == SDLK_DOWN)
-                    {
-                        Granite::Camera::GetMainCamera()->position.y += cameraSpeed * deltaTime;
-                    }
+                    //if (e.key.keysym.sym == SDLK_DOWN)
+                    //{
+                    //    Granite::Camera::GetMainCamera()->position.y += cameraSpeed * deltaTime;
+                    //}
 
-                    // ovo ne radi dobro zbog pukog x-a
-                    if (e.key.keysym.sym == SDLK_LEFT)
-                    {
-                        Granite::Camera::GetMainCamera()->position.x -= cameraSpeed * deltaTime;
-                    }
+                    //// ovo ne radi dobro zbog pukog x-a
+                    //if (e.key.keysym.sym == SDLK_LEFT)
+                    //{
+                    //    Granite::Camera::GetMainCamera()->position.x -= cameraSpeed * deltaTime;
+                    //}
 
-                    if (e.key.keysym.sym == SDLK_RIGHT)
-                    {
-                        Granite::Camera::GetMainCamera()->position.x += cameraSpeed * deltaTime;
-                    }
+                    //if (e.key.keysym.sym == SDLK_RIGHT)
+                    //{
+                    //    Granite::Camera::GetMainCamera()->position.x += cameraSpeed * deltaTime;
+                    //}
 
-                    if (e.key.keysym.sym == SDLK_a)
-                    {
-                        fYaw += 3.f * deltaTime;
-                    }
+                    //if (e.key.keysym.sym == SDLK_a)
+                    //{
+                    //    fYaw += 3.f * deltaTime;
+                    //}
 
-                    if (e.key.keysym.sym == SDLK_d)
-                    {
-                        fYaw -= 3.f * deltaTime;
-                    }
+                    //if (e.key.keysym.sym == SDLK_d)
+                    //{
+                    //    fYaw -= 3.f * deltaTime;
+                    //}
 
-                    if (e.key.keysym.sym == SDLK_w)
-                    {
-                        Granite::Camera::GetMainCamera()->position += vForward;
-                    }
+                    //if (e.key.keysym.sym == SDLK_w)
+                    //{
+                    //    Granite::Camera::GetMainCamera()->position += vForward;
+                    //}
 
-                    if (e.key.keysym.sym == SDLK_s)
-                    {
-                        Granite::Camera::GetMainCamera()->position -= vForward;
-                    }
+                    //if (e.key.keysym.sym == SDLK_s)
+                    //{
+                    //    Granite::Camera::GetMainCamera()->position -= vForward;
+                    //}
                 }
             }
         }
